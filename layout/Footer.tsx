@@ -83,7 +83,7 @@ export default function Footer() {
             <div className="text-gray-400 mb-8">
               <div className="flex items-center">
                 <Mail className="h-5 w-5 mr-2" />
-                mail@openoaisis.com
+                chris@openoaisis.com
               </div>
             </div>
             <div>
