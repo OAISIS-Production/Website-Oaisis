@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-primary via-secondary to-primary text-gray-100;
+  }
+  input, textarea {
+    @apply bg-primary-light/10 border-primary-light/20 text-white placeholder-gray-400 rounded-md shadow-sm focus:ring-accent focus:border-accent;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Add smooth gradient transitions */
+section {
+  @apply transition-all duration-500;
+}
