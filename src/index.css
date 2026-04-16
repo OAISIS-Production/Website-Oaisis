@@ -3,19 +3,172 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-gradient-to-br from-primary via-secondary to-primary text-gray-100;
+    font-family: 'Outfit', 'SF Pro Display', -apple-system, 'Helvetica Neue', sans-serif;
+    color: #2A1F38;
+    background: linear-gradient(180deg, #D0E7F5 0%, #F5EFE0 25%, #FAF7F0 55%, #FDFCF8 100%);
+    min-height: 100vh;
   }
+
   input, textarea {
-    @apply bg-primary-light/10 border-primary-light/20 text-white placeholder-gray-400 rounded-md shadow-sm focus:ring-accent focus:border-accent;
+    @apply bg-white/60 border border-tan-light/40 text-brand-text placeholder-brand-text-muted rounded-glass shadow-sm focus:ring-emerald focus:border-emerald backdrop-blur-glass;
   }
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-/* Add smooth gradient transitions */
+/* Smooth transitions */
 section {
   @apply transition-all duration-500;
+}
+
+/* ========================================
+   GLASS DESIGN SYSTEM
+   ======================================== */
+
+@layer components {
+  /* Default — White Frost */
+  .glass {
+    background: rgba(255,255,255,0.48);
+    border: 1px solid rgba(255,255,255,0.7);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.5);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 16px;
+    padding: 28px;
+  }
+
+  /* Tan Frost */
+  .glass-tan {
+    background: rgba(237,226,204,0.4);
+    border: 1px solid rgba(220,201,160,0.5);
+    box-shadow: 0 4px 20px rgba(160,128,80,0.06), inset 0 1px 0 rgba(255,255,255,0.4);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 16px;
+    padding: 28px;
+  }
+
+  /* Green Tint */
+  .glass-green {
+    background: rgba(26,107,74,0.05);
+    border: 1px solid rgba(26,107,74,0.12);
+    box-shadow: 0 4px 20px rgba(26,107,74,0.04);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 16px;
+    padding: 28px;
+  }
+
+  /* Blue Tint */
+  .glass-blue {
+    background: rgba(37,99,168,0.04);
+    border: 1px solid rgba(91,160,212,0.12);
+    box-shadow: 0 4px 20px rgba(37,99,168,0.04);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 16px;
+    padding: 28px;
+  }
+
+  /* Glow — Premium/Hero */
+  .glass-glow {
+    background: rgba(255,255,255,0.52);
+    border: 1px solid rgba(255,255,255,0.75);
+    box-shadow: 0 8px 32px rgba(45,139,85,0.06), 0 4px 16px rgba(124,58,237,0.04), inset 0 1px 0 rgba(255,255,255,0.5);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 16px;
+    padding: 28px;
+  }
+
+  /* Night glass variants */
+  .glass-night {
+    background: rgba(22,18,42,0.8);
+    border: 1px solid rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 28px;
+  }
+
+  .glass-night-green {
+    background: rgba(26,107,74,0.08);
+    border: 1px solid rgba(45,139,85,0.12);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 28px;
+  }
+
+  .glass-night-blue {
+    background: rgba(37,99,168,0.08);
+    border: 1px solid rgba(91,160,212,0.12);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 28px;
+  }
+}
+
+/* ========================================
+   LOGO GLOW SYSTEM
+   ======================================== */
+
+.logo-glow-green {
+  filter: brightness(1.1) drop-shadow(0 0 12px rgba(45,139,85,0.3));
+}
+
+.logo-glow-blue {
+  filter: brightness(1.15) drop-shadow(0 0 14px rgba(59,130,200,0.35));
+}
+
+.logo-glow-gold {
+  filter: brightness(1.15) drop-shadow(0 0 12px rgba(212,165,74,0.3));
+}
+
+.logo-glow-moonlit {
+  filter: brightness(1.35) contrast(1.05) drop-shadow(0 0 14px rgba(147,197,232,0.3));
+}
+
+.logo-glow-white {
+  filter: brightness(1.2) drop-shadow(0 0 14px rgba(255,255,255,0.4));
+}
+
+/* Signature Gradient (for text or decorative elements) */
+.gradient-signature {
+  background: linear-gradient(135deg, #A08050 0%, #C8AD7E 12%, #1A6B4A 30%, #40A865 45%, #298475 55%, #5BA0D4 65%, #2563A8 80%, #93C5E8 92%, #DCC9A0 100%);
+}
+
+/* Photography overlay */
+.photo-overlay {
+  background: linear-gradient(180deg,
+    rgba(91,160,212,0.1) 0%,
+    rgba(37,99,168,0.04) 30%,
+    transparent 50%,
+    rgba(200,173,126,0.1) 75%,
+    rgba(245,239,224,0.4) 100%
+  );
+}
+
+.photo-vignette {
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(37,99,168,0.06) 100%);
+}
+
+/* OAISIS Wordmark */
+.oaisis-wordmark {
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 5px;
+  color: #0F4D35;
+  opacity: 0.5;
+  text-transform: uppercase;
+}
+
+/* Dark mode overrides */
+.dark body {
+  background: linear-gradient(135deg, #0C0A18, #0A1525, #081420);
+  color: #E4DFF0;
 }

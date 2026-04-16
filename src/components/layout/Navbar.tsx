@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
+import GlowLogo from '../ui/GlowLogo';
 
 interface NavbarProps {
   scrolled: boolean;
@@ -19,43 +19,44 @@ export default function Navbar({ scrolled }: NavbarProps) {
   };
 
   return (
-    <div className="fixed w-full z-50 px-4 sm:px-6 lg:px-8 top-6">
-      <nav className={`max-w-7xl mx-auto rounded-3xl transition-all duration-300 border-2 border-primary-light/20 backdrop-blur-lg ${
-        scrolled ? 'bg-primary/30' : 'bg-transparent'
-      }`}>
-        <div className="px-6 sm:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <Link to="/" className="flex items-center">
-              <img 
-                src="/assets/images/logo.png" 
-                alt="OAISIS Logo" 
-                className="h-10 w-10 object-contain"
-              />
-              <span className="ml-2 text-2xl font-bold text-white tracking-wide">OAISIS</span>
+    <div className="sticky top-0 z-50 w-full">
+      <nav
+        className="transition-all duration-300"
+        style={{
+          background: scrolled ? 'rgba(245,239,224,0.6)' : 'rgba(245,239,224,0.4)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderBottom: '1px solid rgba(220,201,160,0.3)',
+          padding: '10px 28px',
+        }}
+      >
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-between items-center">
+            <Link to="/" className="flex items-center gap-3">
+              <GlowLogo size={36} glow="green" />
+              <span className="oaisis-wordmark">OAISIS</span>
             </Link>
-            <div className="hidden md:flex space-x-8">
+            <div className="hidden md:flex items-center gap-1">
               {[
                 { label: 'About', id: 'about' },
                 { label: 'Solutions', id: 'services' },
                 { label: 'Process', id: 'method' },
                 { label: 'Success Stories', id: 'case-studies' },
                 { label: 'Resources', id: 'insights' },
-                { label: 'Contact', id: 'contact' }
+                { label: 'Contact', id: 'contact' },
               ].map((item) => (
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`text-sm tracking-wider font-semibold text-white hover:text-primary-light transition-colors relative group ${
-                    isHomePage ? 'cursor-pointer' : ''
-                  }`}
+                  className="text-[13px] font-medium tracking-wide text-brand-text/70 hover:text-emerald transition-colors px-3 py-1.5 rounded-lg hover:bg-sky/[0.06] hover:border-sky-light/[0.12]"
                 >
-                  {!isHomePage && (
+                  {!isHomePage ? (
                     <Link to={`/#${item.id}`} className="block">
                       {item.label}
                     </Link>
+                  ) : (
+                    item.label
                   )}
-                  {isHomePage && item.label}
-                  <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-primary-light transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
                 </button>
               ))}
             </div>

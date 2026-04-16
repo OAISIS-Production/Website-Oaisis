@@ -7,15 +7,15 @@ import Footer from '../components/layout/Footer';
 
 export default function CapitalTechCaseStudy() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-primary">
+    <div className="min-h-screen">
       <Navbar scrolled={true} />
-      
+
       <main className="pt-32 pb-24">
         {/* Case Study Header */}
         <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link 
-            to="/" 
-            className="inline-flex items-center text-accent hover:text-accent-hover transition-colors mb-8"
+          <Link
+            to="/"
+            className="inline-flex items-center text-emerald hover:text-emerald-deep transition-colors mb-8"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Case Studies
@@ -28,21 +28,21 @@ export default function CapitalTechCaseStudy() {
             className="mb-12"
           >
             <div className="flex items-center space-x-4 mb-6">
-              <span className="bg-accent/20 text-accent px-4 py-1 rounded-full text-sm font-medium">
+              <span className="bg-emerald/[0.12] text-emerald px-4 py-1 rounded-full text-sm font-medium">
                 Finance
               </span>
-              <div className="flex items-center text-gray-400 text-sm">
+              <div className="flex items-center text-brand-text-muted text-sm">
                 <Building2 className="w-4 h-4 mr-2" />
                 CapitalTech Bank
               </div>
             </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+
+            <h1 className="text-4xl md:text-5xl font-extralight text-brand-text mb-6">
               AI-Driven Operations Reduce Overhead by 42%
             </h1>
-            
-            <div className="prose prose-lg prose-invert max-w-none">
-              <p className="text-xl text-gray-300 leading-relaxed">
+
+            <div className="prose prose-lg max-w-none">
+              <p className="text-base text-brand-text-sec leading-relaxed">
                 How CapitalTech Bank revolutionized their operational efficiency through automated risk assessment and intelligent fraud detection systems.
               </p>
             </div>
@@ -55,7 +55,7 @@ export default function CapitalTechCaseStudy() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mb-12"
           >
-            <div className="aspect-video rounded-xl overflow-hidden">
+            <div className="aspect-video rounded-glass overflow-hidden">
               <img
                 src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1600"
                 alt="CapitalTech Bank Headquarters"
@@ -88,10 +88,10 @@ export default function CapitalTechCaseStudy() {
                 icon: <LineChart className="w-6 h-6" />
               }
             ].map((stat, index) => (
-              <div key={index} className="bg-white/5 rounded-xl p-6 text-center">
-                <div className="text-accent mb-3 flex justify-center">{stat.icon}</div>
-                <div className="text-3xl font-bold text-white mb-2">{stat.metric}</div>
-                <div className="text-gray-400">{stat.label}</div>
+              <div key={index} className="glass rounded-glass p-6 text-center">
+                <div className="text-emerald mb-3 flex justify-center">{stat.icon}</div>
+                <div className="text-3xl font-semibold text-brand-text mb-2">{stat.metric}</div>
+                <div className="text-brand-text-muted">{stat.label}</div>
               </div>
             ))}
           </motion.div>
@@ -101,12 +101,12 @@ export default function CapitalTechCaseStudy() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="prose prose-lg prose-invert max-w-none"
+            className="prose prose-lg max-w-none"
           >
-            <h2 className="text-3xl font-bold text-white mb-6">
+            <h2 className="text-3xl font-extralight text-brand-text mb-6">
               The Challenge
             </h2>
-            <p className="text-gray-300 mb-8">
+            <p className="text-brand-text-sec mb-8">
               CapitalTech Bank faced several critical challenges in their operations:
             </p>
             <ul className="space-y-4 mb-12">
@@ -116,17 +116,17 @@ export default function CapitalTechCaseStudy() {
                 "Increasing regulatory compliance requirements",
                 "Growing customer demand for faster service"
               ].map((point, index) => (
-                <li key={index} className="flex items-start space-x-3 text-gray-300">
-                  <span className="text-accent mt-1">◆</span>
+                <li key={index} className="flex items-start space-x-3 text-brand-text-sec">
+                  <span className="text-emerald mt-1">◆</span>
                   <span>{point}</span>
                 </li>
               ))}
             </ul>
 
-            <h2 className="text-3xl font-bold text-white mb-6">
+            <h2 className="text-3xl font-extralight text-brand-text mb-6">
               Our Solution
             </h2>
-            <p className="text-gray-300 mb-8">
+            <p className="text-brand-text-sec mb-8">
               We implemented a comprehensive AI-powered operational system:
             </p>
 
@@ -153,15 +153,15 @@ export default function CapitalTechCaseStudy() {
                   description: "Automated regulatory compliance checking and reporting."
                 }
               ].map((feature, index) => (
-                <div key={index} className="bg-white/5 rounded-lg p-6">
-                  <div className="text-accent mb-4">{feature.icon}</div>
-                  <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-                  <p className="text-gray-300">{feature.description}</p>
+                <div key={index} className="glass rounded-glass p-6">
+                  <div className="text-emerald mb-4">{feature.icon}</div>
+                  <h3 className="text-xl font-semibold text-brand-text mb-2">{feature.title}</h3>
+                  <p className="text-brand-text-sec">{feature.description}</p>
                 </div>
               ))}
             </div>
 
-            <h2 className="text-3xl font-bold text-white mb-6">
+            <h2 className="text-3xl font-extralight text-brand-text mb-6">
               Implementation Process
             </h2>
             <div className="space-y-8 mb-12">
@@ -203,28 +203,28 @@ export default function CapitalTechCaseStudy() {
                   ]
                 }
               ].map((phase, index) => (
-                <div key={index} className="bg-white/5 rounded-lg p-6">
+                <div key={index} className="glass rounded-glass p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-semibold text-white">{phase.phase}</h3>
-                    <span className="text-accent">{phase.duration}</span>
+                    <h3 className="text-xl font-semibold text-brand-text">{phase.phase}</h3>
+                    <span className="text-emerald">{phase.duration}</span>
                   </div>
                   <ul className="space-y-2">
                     {phase.activities.map((activity, actIndex) => (
-                      <li key={actIndex} className="text-gray-300">• {activity}</li>
+                      <li key={actIndex} className="text-brand-text-sec">• {activity}</li>
                     ))}
                   </ul>
                 </div>
               ))}
             </div>
 
-            <h2 className="text-3xl font-bold text-white mb-6">
+            <h2 className="text-3xl font-extralight text-brand-text mb-6">
               Results & Impact
             </h2>
-            <p className="text-gray-300 mb-8">
+            <p className="text-brand-text-sec mb-8">
               The implementation of our AI solution delivered significant improvements across all operational areas:
             </p>
 
-            <div className="bg-white/5 rounded-xl p-8 mb-12">
+            <div className="glass rounded-glass p-8 mb-12">
               <ul className="space-y-6">
                 {[
                   {
@@ -249,10 +249,10 @@ export default function CapitalTechCaseStudy() {
                   }
                 ].map((result, index) => (
                   <li key={index} className="flex items-center space-x-6">
-                    <div className="w-32 text-accent font-bold">{result.value}</div>
+                    <div className="w-32 text-emerald font-bold">{result.value}</div>
                     <div>
-                      <h4 className="text-white font-semibold">{result.metric}</h4>
-                      <p className="text-gray-400">{result.description}</p>
+                      <h4 className="text-brand-text font-semibold">{result.metric}</h4>
+                      <p className="text-brand-text-muted">{result.description}</p>
                     </div>
                   </li>
                 ))}
@@ -268,17 +268,17 @@ export default function CapitalTechCaseStudy() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="bg-accent/20 backdrop-blur-md rounded-2xl p-12 border border-accent/30 text-center"
+            className="glass-green backdrop-blur-md rounded-2xl p-12 border border-emerald/30 text-center"
           >
-            <h2 className="text-3xl font-bold text-white mb-6">
+            <h2 className="text-3xl font-extralight text-brand-text mb-6">
               Ready to Transform Your Financial Operations?
             </h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            <p className="text-base text-brand-text-sec mb-8 max-w-2xl mx-auto">
               Let's discuss how our AI solutions can optimize your processes and reduce operational costs.
             </p>
             <Link
               to="/#contact"
-              className="inline-block bg-accent text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-accent-hover transition-all duration-300 shadow-lg shadow-accent/20 hover:shadow-xl hover:shadow-accent/30"
+              className="inline-block bg-emerald text-white px-8 py-4 rounded-glass text-lg font-semibold hover:bg-emerald-deep transition-all duration-300 shadow-lg shadow-emerald/20 hover:shadow-xl hover:shadow-emerald/30"
             >
               Schedule a Consultation
             </Link>
