@@ -1,80 +1,151 @@
-import { lazy, Suspense, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
-import { ScrollTrigger, gsap } from '../../lib/scroll';
-import HeroClouds from './HeroClouds';
+import { gsap, ScrollTrigger } from '../../lib/scroll';
+import LogoMark from '../ui/LogoMark';
 
-// HeroGlassWordmark bundles all of Three.js + R3F + Drei (~700KB minified).
-// Lazy-load it so non-home pages skip the chunk entirely. While it loads,
-// show the same static CSS fallback the wordmark uses on mobile / reduced-motion.
-const HeroGlassWordmark = lazy(() => import('./HeroGlassWordmark'));
+const VIDEO_WEBM = '/hero/oaisis-hero-dissolve.webm';
+const VIDEO_MP4 = '/hero/oaisis-hero-dissolve.mp4';
+const POSTER_JPG = '/hero/oaisis-hero-poster.jpg';
 
-function WordmarkFallback() {
-  return (
-    <div
-      className="flex items-center justify-center pointer-events-none select-none w-full h-full"
-      style={{
-        fontFamily: "'Outfit', sans-serif",
-        fontWeight: 200,
-        fontSize: 'clamp(56px, 14vw, 160px)',
-        letterSpacing: '-2px',
-        color: 'rgba(255,255,255,0.92)',
-        textShadow:
-          '0 2px 8px rgba(91,160,212,0.25), 0 0 40px rgba(255,255,255,0.4), 0 0 80px rgba(200,173,126,0.18)',
-      }}
-      aria-label="OAISIS"
-    >
-      OAISIS
-    </div>
-  );
-}
+type Status = 'loading' | 'ready' | 'failed';
 
+/**
+ * Scroll-driven dissolve hero.
+ *
+ * Top of page: formed front-facing OAISIS logo against soft sky (first frame).
+ * Scroll down 1 viewport-height: video scrubs through to white sky mist.
+ * Text overlay fades IN over the same scroll range — pure handoff.
+ * Reverse scroll reforms the logo.
+ *
+ * If the video assets aren't present yet (404), we fall back to a static
+ * CSS sky + LogoMark hero with the text overlay shown immediately. The
+ * scaffold renders meaningfully now and upgrades automatically the moment
+ * the .webm / .mp4 / poster files land in public/hero/.
+ *
+ * prefers-reduced-motion: no scroll-driven anything. Just the poster (or
+ * the static fallback) with all text visible.
+ */
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const wordmarkWrapRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const scrollCueRef = useRef<HTMLDivElement>(null);
+  const [status, setStatus] = useState<Status>('loading');
 
+  // Detect if the video assets are reachable. If not, drop the <video>
+  // element entirely so the static fallback renders cleanly.
   useEffect(() => {
-    if (!sectionRef.current || !wordmarkWrapRef.current) return;
+    let cancelled = false;
+    // Probe with HEAD on the .mp4 — fastest single check.
+    fetch(VIDEO_MP4, { method: 'HEAD' })
+      .then((res) => {
+        if (cancelled) return;
+        setStatus(res.ok ? 'ready' : 'failed');
+      })
+      .catch(() => {
+        if (!cancelled) setStatus('failed');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Wire the scroll-scrub once video is ready (or skip on reduced-motion / static).
+  useEffect(() => {
+    if (!sectionRef.current) return;
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) return;
+    if (prefersReduced) {
+      // Show text overlay fully right away; no scroll animation.
+      if (overlayRef.current) overlayRef.current.style.opacity = '1';
+      return;
+    }
 
-    const ctx = gsap.context(() => {
-      // Pin hero for an extra 60% of viewport, scale + fade wordmark on exit
-      gsap.to(wordmarkWrapRef.current, {
-        scale: 0.85,
-        opacity: 0.25,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top top',
-          end: '+=60%',
-          pin: true,
-          scrub: true,
-          pinSpacing: true,
-        },
-      });
+    const video = videoRef.current;
 
-      // Fade out the scroll cue once user starts scrolling
-      if (scrollCueRef.current) {
-        gsap.to(scrollCueRef.current, {
-          opacity: 0,
-          y: 20,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top top',
-            end: '+=10%',
-            scrub: true,
-          },
-        });
+    const setupScrub = () => {
+      const ctx = gsap.context(() => {
+        // 1) Scrub the video currentTime to scroll position.
+        if (video && status === 'ready') {
+          video.pause();
+          gsap.to(video, {
+            currentTime: video.duration || 4.5,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top top',
+              end: '+=100%',
+              scrub: 0.5,
+            },
+          });
+        }
+
+        // 2) Fade the text overlay IN as scroll progresses.
+        if (overlayRef.current) {
+          gsap.fromTo(
+            overlayRef.current,
+            { opacity: 0, y: 24 },
+            {
+              opacity: 1,
+              y: 0,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: 'top top',
+                end: '+=70%',
+                scrub: 0.5,
+              },
+            }
+          );
+        }
+
+        // 3) Fade the scroll cue OUT once user starts scrolling.
+        if (scrollCueRef.current) {
+          gsap.to(scrollCueRef.current, {
+            opacity: 0,
+            y: 12,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top top',
+              end: '+=12%',
+              scrub: true,
+            },
+          });
+        }
+      }, sectionRef);
+
+      return () => {
+        ctx.revert();
+        ScrollTrigger.refresh();
+      };
+    };
+
+    // If we're in static-fallback mode, just show the overlay immediately
+    // and skip the video-scrub timeline.
+    if (status === 'failed') {
+      if (overlayRef.current) overlayRef.current.style.opacity = '1';
+      const cleanup = setupScrub();
+      return cleanup;
+    }
+
+    // Video path: wait for metadata so we know duration before scrubbing.
+    if (status === 'ready' && video) {
+      if (video.readyState >= 1) {
+        return setupScrub();
       }
-    }, sectionRef);
+      const onMeta = () => {
+        setupScrub();
+      };
+      video.addEventListener('loadedmetadata', onMeta, { once: true });
+      return () => video.removeEventListener('loadedmetadata', onMeta);
+    }
+  }, [status]);
 
-    return () => ctx.revert();
-  }, []);
+  const showVideo = status === 'ready';
+  const showStaticLogo = status === 'failed';
 
   return (
     <section
@@ -83,14 +154,56 @@ export default function HeroSection() {
       style={{
         height: '100vh',
         background:
-          'linear-gradient(180deg, #5BA0D4 0%, #93C5E8 40%, #D0E7F5 80%, #F5EFE0 100%)',
+          'linear-gradient(180deg, #93C5E8 0%, #D0E7F5 45%, #F0F5FA 80%, #F5EFE0 100%)',
       }}
     >
-      <HeroClouds />
+      {showVideo && (
+        <video
+          ref={videoRef}
+          poster={POSTER_JPG}
+          muted
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src={VIDEO_WEBM} type="video/webm" />
+          <source src={VIDEO_MP4} type="video/mp4" />
+        </video>
+      )}
 
-      <div className="relative z-10 w-full h-full flex flex-col items-center justify-center px-6">
+      {showStaticLogo && (
+        <div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          aria-hidden="true"
+        >
+          <div
+            className="hero-logo-float"
+            style={{
+              filter: 'drop-shadow(0 8px 36px rgba(91,160,212,0.35)) drop-shadow(0 0 80px rgba(255,255,255,0.5))',
+            }}
+          >
+            <LogoMark size={Math.min(420, Math.floor(typeof window !== 'undefined' ? window.innerWidth * 0.32 : 280))} />
+          </div>
+        </div>
+      )}
+
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse at center 35%, transparent 38%, rgba(245,239,224,0.18) 100%)',
+        }}
+      />
+
+      <div
+        ref={overlayRef}
+        className="relative z-10 w-full h-full flex flex-col items-center justify-center px-6 pointer-events-none"
+        style={{ opacity: 0 }}
+      >
         <motion.p
-          initial={{ opacity: 0, y: -8 }}
+          initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           style={{
@@ -98,55 +211,47 @@ export default function HeroSection() {
             fontWeight: 600,
             letterSpacing: '4px',
             textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.75)',
-            textShadow: '0 1px 8px rgba(37,99,168,0.25)',
-            marginBottom: 24,
+            color: 'rgba(15,77,53,0.7)',
+            textShadow: '0 1px 8px rgba(255,255,255,0.7)',
+            marginTop: 'clamp(140px, 22vh, 240px)',
+            marginBottom: 18,
           }}
         >
           The Intelligent Enterprise
         </motion.p>
 
-        <div
-          ref={wordmarkWrapRef}
-          className="relative will-change-transform"
-          style={{
-            width: 'min(90vw, 1200px)',
-            height: 'clamp(160px, 28vw, 320px)',
-          }}
-        >
-          <Suspense fallback={<WordmarkFallback />}>
-            <HeroGlassWordmark />
-          </Suspense>
-        </div>
+        <div style={{ flex: 1 }} />
 
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
+        <motion.h1
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          className="text-center mt-6 mx-auto"
+          transition={{ duration: 0.7, delay: 0.35 }}
+          className="text-center mx-auto"
           style={{
-            fontSize: 'clamp(18px, 2.5vw, 26px)',
+            fontSize: 'clamp(20px, 2.6vw, 28px)',
             fontWeight: 300,
-            color: '#FFFFFF',
-            letterSpacing: '-0.2px',
-            textShadow: '0 2px 10px rgba(37,99,168,0.25)',
+            color: '#0F4D35',
+            letterSpacing: '-0.3px',
+            lineHeight: 1.3,
             maxWidth: 640,
-            lineHeight: 1.35,
+            textShadow: '0 2px 12px rgba(255,255,255,0.7)',
+            marginBottom: 26,
           }}
         >
           The future of business, installed.
-        </motion.p>
+        </motion.h1>
 
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-3 mt-10"
+          transition={{ duration: 0.7, delay: 0.55 }}
+          className="flex flex-col sm:flex-row gap-3 pointer-events-auto"
+          style={{ marginBottom: 'clamp(80px, 14vh, 140px)' }}
         >
-          <Link to="/demo" className="btn-hero-solid">
+          <Link to="/demo" className="btn-hero-solid-warm">
             Book a demo
           </Link>
-          <Link to="/pro-os" className="btn-hero-ghost">
+          <Link to="/pro-os" className="btn-hero-ghost-warm">
             See Pro OS
           </Link>
         </motion.div>
@@ -155,7 +260,7 @@ export default function HeroSection() {
       <div
         ref={scrollCueRef}
         className="absolute left-0 right-0 flex flex-col items-center pointer-events-none z-10"
-        style={{ bottom: 32 }}
+        style={{ bottom: 28 }}
         aria-hidden="true"
       >
         <span
@@ -164,8 +269,8 @@ export default function HeroSection() {
             fontWeight: 600,
             letterSpacing: '3px',
             textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.7)',
-            marginBottom: 8,
+            color: 'rgba(15,77,53,0.55)',
+            marginBottom: 6,
           }}
         >
           Scroll
@@ -173,7 +278,7 @@ export default function HeroSection() {
         <motion.div
           animate={{ y: [0, 6, 0] }}
           transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ color: 'rgba(255,255,255,0.7)' }}
+          style={{ color: 'rgba(15,77,53,0.55)' }}
         >
           <ChevronDown className="w-5 h-5" />
         </motion.div>

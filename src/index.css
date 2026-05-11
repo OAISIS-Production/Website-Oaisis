@@ -359,6 +359,69 @@ section {
   transform: translateY(-1px);
 }
 
+/* Hero CTAs — warm variants for the new sky/sand dissolve hero (dark text on
+   the bright sky end-state, instead of the v3-gate's white-on-photo CTAs). */
+
+.btn-hero-solid-warm {
+  background: #FFFFFF;
+  color: #0F4D35;
+  border: 1px solid rgba(255,255,255,0.95);
+  border-radius: 999px;
+  padding: 14px 30px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgba(91,160,212,0.22);
+  cursor: pointer;
+}
+.btn-hero-solid-warm:hover {
+  background: #FFFFFF;
+  filter: brightness(1.05);
+  box-shadow: 0 16px 42px rgba(91,160,212,0.32), 0 0 0 1px rgba(220,201,160,0.6);
+  transform: translateY(-2px);
+  color: #1A6B4A;
+}
+
+.btn-hero-ghost-warm {
+  background: rgba(255,255,255,0.42);
+  color: #0F4D35;
+  border: 1px solid rgba(15,77,53,0.22);
+  border-radius: 999px;
+  padding: 14px 30px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-hero-ghost-warm:hover {
+  background: rgba(255,255,255,0.6);
+  border-color: rgba(15,77,53,0.4);
+  transform: translateY(-2px);
+}
+
+/* Gentle float for the static logo fallback (when hero video assets aren't dropped yet). */
+@keyframes hero-logo-float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-10px) scale(1.01); }
+}
+.hero-logo-float {
+  animation: hero-logo-float 6s ease-in-out infinite;
+}
+
 .btn-hero-solid {
   background: #FFFFFF;
   color: #2A1F38;
