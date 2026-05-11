@@ -102,11 +102,20 @@ echo "    JS:  ${NEW_JS:-?}"
 echo "    CSS: ${NEW_CSS:-?}"
 
 # ---- Upload ------------------------------------------------------------------
+# 1. Hashed assets in dist/assets/ — content-addressed filenames, cache forever.
 echo "==> Uploading hashed assets (immutable, 1y cache)..."
 gsutil -m \
   -h "Cache-Control:public, max-age=31536000, immutable" \
   rsync -r dist/assets/ "$BUCKET/assets/"
 
+# 2. Other top-level files / dirs (e.g. dist/hero/, dist/CNAME) — stable but
+#    not content-hashed. 1 day cache so updates eventually propagate.
+echo "==> Uploading other static files (1 day cache)..."
+gsutil -m \
+  -h "Cache-Control:public, max-age=86400" \
+  rsync -r -x "assets/.*|.*\.html$" dist/ "$BUCKET/"
+
+# 3. HTML entry points — short cache + must-revalidate so deploys propagate fast.
 echo "==> Uploading HTML (5 min cache, must-revalidate)..."
 gsutil -m \
   -h "Cache-Control:public, max-age=300, must-revalidate" \
