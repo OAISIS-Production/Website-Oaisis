@@ -9,8 +9,10 @@ import ProOSPrivateEquity from './pages/ProOSPrivateEquity';
 import ProOSGeneral from './pages/ProOSGeneral';
 import DemoPage from './pages/DemoPage';
 import ComingSoon from './pages/ComingSoon';
+import { useLenisScroll } from './lib/scroll';
 
 export default function App() {
+  useLenisScroll();
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
@@ -24,6 +26,9 @@ export default function App() {
     if (!location.hash) window.scrollTo(0, 0);
   }, [location.pathname]);
 
+  // HomePage owns its own integrated footer (FinalOasis); other pages use the global Footer.
+  const isHome = location.pathname === '/';
+
   return (
     <>
       <Navbar scrolled={scrolled} />
@@ -36,7 +41,7 @@ export default function App() {
         <Route path="/demo" element={<DemoPage />} />
         <Route path="*" element={<ComingSoon title="Not found" eyebrow="404" />} />
       </Routes>
-      <Footer />
+      {!isHome && <Footer />}
     </>
   );
 }

@@ -359,6 +359,56 @@ section {
   transform: translateY(-1px);
 }
 
+.btn-hero-solid {
+  background: #FFFFFF;
+  color: #2A1F38;
+  border: 1px solid rgba(255,255,255,0.9);
+  border-radius: 999px;
+  padding: 14px 32px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  box-shadow: 0 8px 26px rgba(255,255,255,0.2);
+  cursor: pointer;
+}
+.btn-hero-solid:hover {
+  background: #FFFFFF;
+  filter: brightness(1.05);
+  box-shadow: 0 12px 36px rgba(255,255,255,0.32), 0 0 0 1px rgba(200,173,126,0.4);
+  transform: translateY(-2px);
+}
+
+.btn-hero-ghost {
+  background: rgba(255,255,255,0.08);
+  color: #FFFFFF;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 999px;
+  padding: 14px 32px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-hero-ghost:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.6);
+  transform: translateY(-2px);
+}
+
 .btn-glass-emerald {
   background: rgba(26,107,74,0.08);
   border: 1px solid rgba(26,107,74,0.22);
@@ -454,6 +504,82 @@ section {
   font-size: 14px;
   line-height: 1.8;
   margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   OASIS LANDING ANIMATIONS
+   ======================================== */
+
+@keyframes palm-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(2deg); }
+}
+
+.palm-sway {
+  animation: palm-sway 7s ease-in-out infinite;
+}
+/* Right-side fronds keep their X-flip; only animate rotation */
+.palm-sway[style*="scaleX(-1)"] {
+  animation: palm-sway-flipped 7s ease-in-out infinite;
+}
+@keyframes palm-sway-flipped {
+  0%, 100% { transform: scaleX(-1) rotate(0deg); }
+  50%      { transform: scaleX(-1) rotate(2deg); }
+}
+
+@keyframes oasis-logo-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+@keyframes oasis-logo-pulse {
+  0%, 100% { filter: drop-shadow(0 0 32px rgba(220,201,160,0.4)) drop-shadow(0 0 64px rgba(255,253,245,0.15)); }
+  50%      { filter: drop-shadow(0 0 44px rgba(220,201,160,0.55)) drop-shadow(0 0 80px rgba(255,253,245,0.22)); }
+}
+.oasis-logo-float {
+  animation: oasis-logo-float 4s ease-in-out infinite, oasis-logo-pulse 3s ease-in-out infinite;
+}
+
+@keyframes particle-drift {
+  0%   { transform: translateY(20px); opacity: 0; }
+  15%  { opacity: var(--p-opacity, 0.4); }
+  85%  { opacity: var(--p-opacity, 0.4); }
+  100% { transform: translateY(-110vh); opacity: 0; }
+}
+.particle {
+  position: absolute;
+  bottom: 0;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 80%);
+  animation-name: particle-drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  pointer-events: none;
+}
+
+.btn-oasis-hero {
+  background: rgba(255,255,255,0.92);
+  color: #0F4D35;
+  border: 1px solid rgba(255,255,255,0.95);
+  border-radius: 999px;
+  padding: 18px 40px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  box-shadow: 0 10px 36px rgba(15,77,53,0.25);
+  cursor: pointer;
+}
+.btn-oasis-hero:hover {
+  background: #FFFFFF;
+  box-shadow: 0 16px 48px rgba(220,201,160,0.35), 0 0 0 1px rgba(220,201,160,0.6);
+  transform: translateY(-2px);
 }
 
 /* ========================================
