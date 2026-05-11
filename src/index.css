@@ -301,8 +301,63 @@ section {
 }
 
 /* ========================================
-   GLASS BUTTONS (frosted CTAs across pages)
+   CTA BUTTONS
+   - btn-primary-emerald: solid emerald, white text (hero CTAs, primary actions)
+   - btn-ghost-sky:       glass ghost, sky border, sky-deep text (secondary actions)
+   - btn-glass-emerald:   frosted emerald (inline content CTAs, form submits)
    ======================================== */
+
+.btn-primary-emerald {
+  background: #1A6B4A;
+  color: #FFFFFF;
+  border: 1px solid #1A6B4A;
+  border-radius: 12px;
+  padding: 14px 28px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(26,107,74,0.18);
+  cursor: pointer;
+}
+.btn-primary-emerald:hover {
+  background: #1F7D58;
+  border-color: #1F7D58;
+  filter: brightness(1.05);
+  box-shadow: 0 10px 30px rgba(26,107,74,0.28);
+  transform: translateY(-1px);
+}
+
+.btn-ghost-sky {
+  background: rgba(255,255,255,0.4);
+  border: 1px solid rgba(91,160,212,0.3);
+  color: #2563A8;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 14px 28px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-ghost-sky:hover {
+  background: rgba(255,255,255,0.55);
+  border-color: rgba(91,160,212,0.45);
+  color: #1F4F8F;
+  transform: translateY(-1px);
+}
 
 .btn-glass-emerald {
   background: rgba(26,107,74,0.08);
@@ -399,6 +454,26 @@ section {
   font-size: 14px;
   line-height: 1.8;
   margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   MOBILE RESPONSIVE POLISH
+   ======================================== */
+
+/* Shrink ambient blobs on mobile so they stay ambient, not overpowering */
+@media (max-width: 768px) {
+  .ambient-blob {
+    transform: scale(0.6);
+    transform-origin: center;
+  }
+}
+
+/* Trim glass card padding slightly on small screens */
+@media (max-width: 640px) {
+  .glass, .glass-tan, .glass-green, .glass-blue, .glass-glow,
+  .glass-night, .glass-night-green, .glass-night-blue {
+    padding: 22px;
+  }
 }
 
 /* Dark mode overrides */

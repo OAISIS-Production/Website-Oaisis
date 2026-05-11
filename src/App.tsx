@@ -1,23 +1,40 @@
-import { Routes, Route } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
-
-function HomePage() {
-  return (
-    <main className="min-h-[60vh] flex items-center justify-center">
-      <p className="text-[13px] tracking-wide text-brand-text-sec uppercase" style={{ letterSpacing: '2.5px' }}>
-        Rebuilding
-      </p>
-    </main>
-  );
-}
+import HomePage from './pages/HomePage';
+import ProOSUmbrella from './pages/ProOSUmbrella';
+import ProOSHomeServices from './pages/ProOSHomeServices';
+import ProOSPrivateEquity from './pages/ProOSPrivateEquity';
+import ProOSGeneral from './pages/ProOSGeneral';
+import DemoPage from './pages/DemoPage';
+import ComingSoon from './pages/ComingSoon';
 
 export default function App() {
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!location.hash) window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   return (
     <>
-      <Navbar scrolled={false} />
+      <Navbar scrolled={scrolled} />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/pro-os" element={<ProOSUmbrella />} />
+        <Route path="/pro-os/home-services" element={<ProOSHomeServices />} />
+        <Route path="/pro-os/private-equity" element={<ProOSPrivateEquity />} />
+        <Route path="/pro-os/general" element={<ProOSGeneral />} />
+        <Route path="/demo" element={<DemoPage />} />
+        <Route path="*" element={<ComingSoon title="Not found" eyebrow="404" />} />
       </Routes>
       <Footer />
     </>

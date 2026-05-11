@@ -30,7 +30,7 @@ export default function AmbientBlob({
 }: AmbientBlobProps) {
   return (
     <div
-      className={`absolute rounded-full pointer-events-none ${animate ? 'animate-float' : ''} ${className}`}
+      className={`ambient-blob absolute rounded-full pointer-events-none ${animate ? 'animate-float' : ''} ${className}`}
       style={{
         width: size,
         height: size,

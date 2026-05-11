@@ -41,6 +41,7 @@ export default {
         // Sky & Blue — Clarity & Refinement
         sky: {
           DEFAULT: '#5BA0D4',
+          deep: '#2563A8',
           light: '#93C5E8',
           pale: '#D0E7F5',
         },
