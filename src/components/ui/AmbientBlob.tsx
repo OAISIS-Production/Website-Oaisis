@@ -8,6 +8,7 @@ interface AmbientBlobProps {
   right?: string;
   bottom?: string;
   className?: string;
+  animate?: boolean;
 }
 
 const colorMap: Record<BlobColor, string> = {
@@ -25,10 +26,11 @@ export default function AmbientBlob({
   right,
   bottom,
   className = '',
+  animate = true,
 }: AmbientBlobProps) {
   return (
     <div
-      className={`absolute rounded-full pointer-events-none ${className}`}
+      className={`absolute rounded-full pointer-events-none ${animate ? 'animate-float' : ''} ${className}`}
       style={{
         width: size,
         height: size,
@@ -39,6 +41,7 @@ export default function AmbientBlob({
         right,
         bottom,
       }}
+      aria-hidden="true"
     />
   );
 }
