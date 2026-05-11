@@ -8,6 +8,9 @@ import ProOSHomeServices from './pages/ProOSHomeServices';
 import ProOSPrivateEquity from './pages/ProOSPrivateEquity';
 import ProOSGeneral from './pages/ProOSGeneral';
 import DemoPage from './pages/DemoPage';
+import PricingPage from './pages/PricingPage';
+import ResourcesPage from './pages/ResourcesPage';
+import AboutPage from './pages/AboutPage';
 import ComingSoon from './pages/ComingSoon';
 import { useLenisScroll } from './lib/scroll';
 
@@ -17,7 +20,7 @@ export default function App() {
   const location = useLocation();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 100);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -39,6 +42,9 @@ export default function App() {
         <Route path="/pro-os/private-equity" element={<ProOSPrivateEquity />} />
         <Route path="/pro-os/general" element={<ProOSGeneral />} />
         <Route path="/demo" element={<DemoPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/resources" element={<ResourcesPage />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<ComingSoon title="Not found" eyebrow="404" />} />
       </Routes>
       {!isHome && <Footer />}

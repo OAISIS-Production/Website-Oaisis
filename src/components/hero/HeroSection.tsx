@@ -1,10 +1,34 @@
-import { useEffect, useRef } from 'react';
+import { lazy, Suspense, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { ScrollTrigger, gsap } from '../../lib/scroll';
 import HeroClouds from './HeroClouds';
-import HeroGlassWordmark from './HeroGlassWordmark';
+
+// HeroGlassWordmark bundles all of Three.js + R3F + Drei (~700KB minified).
+// Lazy-load it so non-home pages skip the chunk entirely. While it loads,
+// show the same static CSS fallback the wordmark uses on mobile / reduced-motion.
+const HeroGlassWordmark = lazy(() => import('./HeroGlassWordmark'));
+
+function WordmarkFallback() {
+  return (
+    <div
+      className="flex items-center justify-center pointer-events-none select-none w-full h-full"
+      style={{
+        fontFamily: "'Outfit', sans-serif",
+        fontWeight: 200,
+        fontSize: 'clamp(56px, 14vw, 160px)',
+        letterSpacing: '-2px',
+        color: 'rgba(255,255,255,0.92)',
+        textShadow:
+          '0 2px 8px rgba(91,160,212,0.25), 0 0 40px rgba(255,255,255,0.4), 0 0 80px rgba(200,173,126,0.18)',
+      }}
+      aria-label="OAISIS"
+    >
+      OAISIS
+    </div>
+  );
+}
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -90,7 +114,9 @@ export default function HeroSection() {
             height: 'clamp(160px, 28vw, 320px)',
           }}
         >
-          <HeroGlassWordmark />
+          <Suspense fallback={<WordmarkFallback />}>
+            <HeroGlassWordmark />
+          </Suspense>
         </div>
 
         <motion.p
