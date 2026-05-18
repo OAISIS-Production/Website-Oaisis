@@ -1,12 +1,17 @@
 import { ReactNode } from 'react';
 import Glass from './Glass';
 
-type Accent = 'green' | 'blue' | 'gold';
+// v13 palette — all accents stay in the blue family. The `green` and `gold`
+// names are kept for compatibility with existing call-sites but the colors
+// underneath are now blues, so no caller has to change.
+type Accent = 'green' | 'blue' | 'gold' | 'sky' | 'deep';
 
 const ACCENT_COLOR: Record<Accent, string> = {
-  green: '#1A6B4A',
+  green: '#2563A8',
   blue: '#2563A8',
-  gold: '#A08050',
+  gold: '#5BA0D4',
+  sky: '#5BA0D4',
+  deep: '#1F4F8F',
 };
 
 interface CapabilityTileProps {
@@ -18,7 +23,7 @@ interface CapabilityTileProps {
 
 export default function CapabilityTile({
   icon,
-  accent = 'green',
+  accent = 'blue',
   title,
   description,
 }: CapabilityTileProps) {

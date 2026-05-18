@@ -3,7 +3,7 @@ import Glass from './Glass';
 import { ArrowRight } from 'lucide-react';
 
 interface ProductCardProps {
-  variant: 'tan' | 'green' | 'blue';
+  variant: 'sky' | 'green' | 'blue';
   eyebrow: string;
   eyebrowColor: string;
   title: string;

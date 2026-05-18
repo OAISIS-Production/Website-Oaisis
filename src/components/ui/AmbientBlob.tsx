@@ -1,4 +1,4 @@
-type BlobColor = 'green' | 'blue' | 'tan' | 'emerald';
+type BlobColor = 'white' | 'sky' | 'deep';
 
 interface AmbientBlobProps {
   color?: BlobColor;
@@ -11,15 +11,15 @@ interface AmbientBlobProps {
   animate?: boolean;
 }
 
+// Sky-blue world only. White wash, sky-blue, and deeper-blue at low opacity.
 const colorMap: Record<BlobColor, string> = {
-  green: 'rgba(26,107,74,0.06)',
-  blue: 'rgba(37,99,168,0.06)',
-  tan: 'rgba(160,128,80,0.06)',
-  emerald: 'rgba(45,139,85,0.08)',
+  white: 'rgba(255,255,255,0.08)',
+  sky: 'rgba(147,197,232,0.06)',
+  deep: 'rgba(91,160,212,0.04)',
 };
 
 export default function AmbientBlob({
-  color = 'green',
+  color = 'sky',
   size = 180,
   top,
   left,

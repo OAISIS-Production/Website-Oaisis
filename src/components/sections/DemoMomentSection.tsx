@@ -2,22 +2,23 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sunrise, MessageCircle, Search, Mail, AlertTriangle, TrendingUp } from 'lucide-react';
 import { gsap, ScrollTrigger } from '../../lib/scroll';
+import Clouds from '../ui/Clouds';
 
 const ACTS = [
   {
-    headline: '6:47 AM. While you slept, Pro OS was working.',
+    headline: '6:47 AM. While you slept, Oaisis OS was working.',
     sub: 'Morning brief is queued. Pipeline is scored. Anomalies are flagged.',
   },
   {
     headline: 'Your morning brief is ready.',
-    sub: 'Pulled from every system in your business. One read, not ten dashboards.',
+    sub: 'Pulled from every system in your company. One read, not ten dashboards.',
   },
   {
-    headline: 'Ask anything about your business.',
-    sub: 'Pro OS reads, thinks, answers. With the data — and the reasoning behind it.',
+    headline: 'Ask anything about your company.',
+    sub: 'Oaisis OS reads, thinks, answers. With the data — and the reasoning behind it.',
   },
   {
-    headline: "While you're in your first meeting, Pro OS is finding your next customer.",
+    headline: "While you're in your first meeting, Oaisis OS is finding your next customer.",
     sub: 'Identifying. Researching. Drafting. You approve.',
   },
   {
@@ -34,35 +35,35 @@ function BrowserChrome({ children }: { children: React.ReactNode }) {
         background: 'rgba(255,255,255,0.92)',
         borderRadius: 18,
         border: '1px solid rgba(255,255,255,0.55)',
-        boxShadow: '0 30px 90px rgba(15,77,53,0.45), 0 0 0 1px rgba(15,77,53,0.06)',
+        boxShadow: '0 30px 90px rgba(31,79,143,0.45), 0 0 0 1px rgba(31,79,143,0.06)',
         overflow: 'hidden',
       }}
     >
       <div
         style={{
           height: 36,
-          background: 'linear-gradient(180deg, rgba(247,243,234,0.95) 0%, rgba(237,226,204,0.85) 100%)',
-          borderBottom: '1px solid rgba(220,201,160,0.4)',
+          background: 'linear-gradient(180deg, rgba(247,250,253,0.95) 0%, rgba(220,234,247,0.85) 100%)',
+          borderBottom: '1px solid rgba(147,197,232,0.4)',
           display: 'flex',
           alignItems: 'center',
           paddingLeft: 14,
           gap: 7,
         }}
       >
-        <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#F1B5A8', opacity: 0.7 }} />
-        <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#F0D690', opacity: 0.7 }} />
-        <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#A8D0AE', opacity: 0.7 }} />
+        <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'rgba(31,79,143,0.35)' }} />
+        <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'rgba(31,79,143,0.45)' }} />
+        <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'rgba(31,79,143,0.55)' }} />
         <span
           style={{
             marginLeft: 12,
             fontSize: 10,
             letterSpacing: '2.5px',
             textTransform: 'uppercase',
-            color: '#A08050',
+            color: '#2563A8',
             fontWeight: 600,
           }}
         >
-          Pro OS · openoaisis
+          Oaisis OS · openoaisis
         </span>
       </div>
       <div style={{ padding: 'clamp(16px, 2vw, 24px)' }}>{children}</div>
@@ -81,7 +82,7 @@ function ActOne() {
               fontWeight: 600,
               letterSpacing: '2.5px',
               textTransform: 'uppercase',
-              color: '#A08050',
+              color: '#2563A8',
             }}
           >
             6:47 AM
@@ -92,9 +93,9 @@ function ActOne() {
           className="flex items-center gap-1.5"
           style={{
             padding: '4px 10px',
-            background: 'rgba(26,107,74,0.12)',
+            background: 'rgba(74,139,194,0.12)',
             borderRadius: 999,
-            border: '1px solid rgba(26,107,74,0.25)',
+            border: '1px solid rgba(74,139,194,0.25)',
           }}
         >
           <span
@@ -103,8 +104,8 @@ function ActOne() {
               width: 7,
               height: 7,
               borderRadius: '50%',
-              background: '#1A6B4A',
-              boxShadow: '0 0 8px rgba(26,107,74,0.5)',
+              background: '#4A8BC2',
+              boxShadow: '0 0 8px rgba(74,139,194,0.5)',
             }}
           />
           <span
@@ -113,14 +114,14 @@ function ActOne() {
               fontWeight: 600,
               letterSpacing: '1.5px',
               textTransform: 'uppercase',
-              color: '#0F4D35',
+              color: '#1F4F8F',
             }}
           >
             Live
           </span>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
         {Array.from({ length: 9 }).map((_, i) => (
           <motion.div
             key={i}
@@ -129,9 +130,9 @@ function ActOne() {
             transition={{ duration: 2.2, repeat: Infinity, delay: (i % 3) * 0.25 }}
             style={{
               height: 56,
-              background: 'rgba(220,201,160,0.22)',
+              background: 'rgba(147,197,232,0.22)',
               borderRadius: 10,
-              border: '1px solid rgba(220,201,160,0.35)',
+              border: '1px solid rgba(147,197,232,0.35)',
             }}
           />
         ))}
@@ -142,15 +143,15 @@ function ActOne() {
 
 function ActTwo() {
   const rows = [
-    { label: 'Revenue', value: '+12.4% week over week', icon: TrendingUp, tone: '#1A6B4A' },
-    { label: 'Pipeline', value: '7 new leads · 2 hot', icon: Sunrise, tone: '#A08050' },
-    { label: 'Anomalies', value: '1 — Region 3 margin', icon: AlertTriangle, tone: '#A08050' },
+    { label: 'Revenue', value: '+12.4% week over week', icon: TrendingUp, tone: '#4A8BC2' },
+    { label: 'Pipeline', value: '7 new leads · 2 hot', icon: Sunrise, tone: '#2563A8' },
+    { label: 'Anomalies', value: '1 — Region 3 margin', icon: AlertTriangle, tone: '#2563A8' },
     { label: "Today's focus", value: 'Close the Acme renewal', icon: MessageCircle, tone: '#2563A8' },
   ];
   return (
     <div style={{ minHeight: 280 }}>
       <div className="flex items-center gap-2 mb-4">
-        <Sunrise className="w-4 h-4" style={{ color: '#A08050' }} />
+        <Sunrise className="w-4 h-4" style={{ color: '#2563A8' }} />
         <p style={{ fontSize: 13, fontWeight: 500, color: '#2A1F38' }}>Morning brief</p>
       </div>
       {rows.map((r, i) => (
@@ -160,7 +161,7 @@ function ActTwo() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
           className="flex items-center justify-between py-3"
-          style={{ borderTop: i > 0 ? '1px solid rgba(220,201,160,0.35)' : 'none' }}
+          style={{ borderTop: i > 0 ? '1px solid rgba(147,197,232,0.35)' : 'none' }}
         >
           <div className="flex items-center gap-3">
             <r.icon className="w-3.5 h-3.5" style={{ color: r.tone }} />
@@ -206,14 +207,14 @@ function ActThree() {
           padding: 12,
           borderRadius: 12,
           background: 'rgba(255,255,255,0.9)',
-          border: '1px solid rgba(26,107,74,0.18)',
+          border: '1px solid rgba(74,139,194,0.18)',
           marginLeft: '15%',
         }}
       >
         <p style={{ fontSize: 12.5, color: '#2A1F38', lineHeight: 1.6, minHeight: 80 }}>
           {typed}
           {typed.length < ANSWER.length && (
-            <span style={{ color: '#1A6B4A', fontWeight: 500 }}>▍</span>
+            <span style={{ color: '#4A8BC2', fontWeight: 500 }}>▍</span>
           )}
         </p>
       </div>
@@ -223,12 +224,12 @@ function ActThree() {
 
 function ActFour() {
   return (
-    <div className="grid grid-cols-2 gap-3" style={{ minHeight: 280 }}>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" style={{ minHeight: 280 }}>
       <div
         style={{
           padding: 14,
           background: 'rgba(212,240,220,0.55)',
-          border: '1px solid rgba(26,107,74,0.18)',
+          border: '1px solid rgba(74,139,194,0.18)',
           borderRadius: 12,
         }}
       >
@@ -238,7 +239,7 @@ function ActFour() {
             fontWeight: 600,
             letterSpacing: '2.5px',
             textTransform: 'uppercase',
-            color: '#1A6B4A',
+            color: '#4A8BC2',
             marginBottom: 10,
           }}
         >
@@ -259,7 +260,7 @@ function ActFour() {
               transition={{ duration: 0.4, delay: 0.2 + i * 0.18 }}
               style={{ fontSize: 11, color: '#2A1F38', lineHeight: 1.5 }}
             >
-              <span style={{ color: '#1A6B4A', marginRight: 6 }}>·</span>
+              <span style={{ color: '#4A8BC2', marginRight: 6 }}>·</span>
               {line}
             </motion.p>
           ))}
@@ -295,18 +296,18 @@ function ActFour() {
 
 function ActFive() {
   return (
-    <div className="grid grid-cols-2 gap-2.5" style={{ minHeight: 280 }}>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5" style={{ minHeight: 280 }}>
       {[
         {
           title: 'Morning brief',
           rows: ['Revenue +12.4%', 'Pipeline · 7 new', 'Anomaly · Region 3'],
-          accent: '#A08050',
+          accent: '#2563A8',
           icon: Sunrise,
         },
         {
           title: 'Question',
           rows: ['West dropped 4.2%', 'Renewal blitz recommended'],
-          accent: '#1A6B4A',
+          accent: '#4A8BC2',
           icon: MessageCircle,
         },
         {
@@ -318,7 +319,7 @@ function ActFive() {
         {
           title: 'Outreach drafted',
           rows: ['2 messages ready', 'Awaiting approval'],
-          accent: '#1A6B4A',
+          accent: '#4A8BC2',
           icon: Mail,
         },
       ].map((panel, i) => (
@@ -330,7 +331,7 @@ function ActFive() {
           style={{
             padding: 12,
             background: 'rgba(255,255,255,0.85)',
-            border: '1px solid rgba(220,201,160,0.4)',
+            border: '1px solid rgba(147,197,232,0.4)',
             borderRadius: 10,
           }}
         >
@@ -417,7 +418,7 @@ export default function DemoMomentSection() {
       id="demo-moment"
       className="relative w-full"
       style={{
-        background: 'linear-gradient(180deg, #2D8B55 0%, #1A6B4A 100%)',
+        background: 'linear-gradient(180deg, #5BA0D4 0%, #93C5E8 100%)',
         height: tallSection ? '500vh' : 'auto',
         paddingTop: tallSection ? 0 : 'clamp(80px, 12vh, 140px)',
         paddingBottom: tallSection ? 0 : 'clamp(80px, 12vh, 140px)',
@@ -428,6 +429,7 @@ export default function DemoMomentSection() {
         className="relative w-full overflow-hidden"
         style={{ height: tallSection ? '100vh' : 'auto', minHeight: tallSection ? undefined : 520 }}
       >
+        <Clouds opacity={0.12} />
         <div
           aria-hidden="true"
           className="absolute pointer-events-none"
@@ -436,7 +438,7 @@ export default function DemoMomentSection() {
             left: '-10%',
             width: 380,
             height: 380,
-            background: 'radial-gradient(circle, rgba(125,212,154,0.30) 0%, transparent 65%)',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.28) 0%, transparent 65%)',
             filter: 'blur(50px)',
           }}
         />
@@ -448,12 +450,12 @@ export default function DemoMomentSection() {
             right: '-8%',
             width: 360,
             height: 360,
-            background: 'radial-gradient(circle, rgba(64,168,101,0.30) 0%, transparent 65%)',
+            background: 'radial-gradient(circle, rgba(147,197,232,0.32) 0%, transparent 65%)',
             filter: 'blur(50px)',
           }}
         />
 
-        <div className="relative h-full grid md:grid-cols-[42%_58%] grid-rows-1 items-center px-6 md:px-12 max-w-7xl mx-auto gap-10">
+        <div className="relative h-full grid grid-cols-1 md:grid-cols-[42%_58%] grid-rows-1 items-center px-6 md:px-12 max-w-7xl mx-auto gap-10">
           <div className="hidden md:flex absolute top-8 left-1/2 -translate-x-1/2 items-center gap-2 z-10 pointer-events-none">
             {ACTS.map((_, i) => (
               <span
@@ -492,22 +494,22 @@ export default function DemoMomentSection() {
                 </p>
                 <h2
                   style={{
-                    fontSize: 'clamp(24px, 3.2vw, 36px)',
+                    fontSize: 'clamp(36px, 5vw, 64px)',
                     fontWeight: 200,
-                    letterSpacing: '-0.4px',
+                    letterSpacing: '-0.04em',
                     color: '#FFFFFF',
-                    lineHeight: 1.2,
-                    marginBottom: 16,
+                    lineHeight: 1.0,
+                    marginBottom: 20,
                   }}
                 >
                   {meta.headline}
                 </h2>
                 <p
                   style={{
-                    fontSize: 'clamp(14px, 1.5vw, 17px)',
-                    lineHeight: 1.65,
+                    fontSize: 'clamp(15px, 1.55vw, 18px)',
+                    lineHeight: 1.6,
                     fontWeight: 300,
-                    color: 'rgba(255,255,255,0.78)',
+                    color: 'rgba(255,255,255,0.82)',
                   }}
                 >
                   {meta.sub}

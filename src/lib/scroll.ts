@@ -35,49 +35,39 @@ export function useLenisScroll() {
       return;
     }
 
+    // Standard Lenis + GSAP wiring — no scrollerProxy.
+    // The prior scrollerProxy(document.body, …) told ScrollTrigger to treat
+    // document.body as the scroll container, but the actual scroll happens
+    // on window. The proxy's getBoundingClientRect returned the viewport
+    // rect instead of body's, so trigger boundaries were computed against a
+    // rect that disagreed with where scroll actually moves — producing the
+    // perceived "freeze at top". Removing the proxy lets ScrollTrigger use
+    // its default window-based scroller, which matches Lenis's behavior.
+    // No duration, no custom easing → Lenis becomes near-instant on wheel
+    // input. With gsap.ticker driving the rAF loop and ScrollTrigger
+    // listening to lenis 'scroll' events, scroll input maps 1:1 to motion.
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 1,
     });
     lenisInstance = lenis;
 
-    // Drive Lenis from rAF
-    let rafId = 0;
-    function raf(time: number) {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    }
-    rafId = requestAnimationFrame(raf);
+    (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
+    (window as unknown as { __ScrollTrigger?: typeof ScrollTrigger }).__ScrollTrigger = ScrollTrigger;
 
-    // Bridge to ScrollTrigger: whenever Lenis scrolls, ScrollTrigger updates.
+    // Bridge: every Lenis scroll event triggers a ScrollTrigger update.
     lenis.on('scroll', ScrollTrigger.update);
 
-    // Use Lenis time for GSAP's ticker so animations sync.
+    // Drive Lenis from GSAP's ticker (single rAF source, no drift).
+    const tickerCallback = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(tickerCallback);
     gsap.ticker.lagSmoothing(0);
 
-    ScrollTrigger.scrollerProxy(document.body, {
-      scrollTop(value) {
-        if (arguments.length && value !== undefined) {
-          lenis.scrollTo(value, { immediate: true });
-        }
-        return window.scrollY;
-      },
-      getBoundingClientRect() {
-        return {
-          top: 0,
-          left: 0,
-          width: window.innerWidth,
-          height: window.innerHeight,
-        };
-      },
-    });
-
-    ScrollTrigger.defaults({ scroller: document.body });
     ScrollTrigger.refresh();
 
     return () => {
-      cancelAnimationFrame(rafId);
+      gsap.ticker.remove(tickerCallback);
       lenis.destroy();
       lenisInstance = null;
       ScrollTrigger.getAll().forEach((t) => t.kill());

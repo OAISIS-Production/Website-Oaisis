@@ -1,9 +1,8 @@
 import { FormEvent, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
-import AmbientBlobs from '../components/ui/AmbientBlobs';
 import Glass from '../components/ui/Glass';
-import GlowLogo from '../components/ui/GlowLogo';
+import InnerPageShell from '../components/ui/InnerPageShell';
 
 interface FormState {
   name: string;
@@ -21,11 +20,11 @@ const FIELDS: Array<{ id: keyof FormState; label: string; type: string; placehol
 
 const inputStyle: React.CSSProperties = {
   background: 'rgba(255,255,255,0.6)',
-  border: '1px solid rgba(26,107,74,0.15)',
+  border: '1px solid rgba(37,99,168,0.15)',
   borderRadius: 10,
   padding: '12px 16px',
   fontSize: 14,
-  color: '#2A1F38',
+  color: '#0F2A4A',
   width: '100%',
   fontFamily: 'inherit',
   outline: 'none',
@@ -44,8 +43,6 @@ export default function DemoPage() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // Placeholder: when wired, POST to /api/demo or similar.
-    // For now, we just reveal the calendar and scroll to it.
     console.log('Demo form submission (stub):', form);
     setSubmitted(true);
     setTimeout(() => {
@@ -54,124 +51,108 @@ export default function DemoPage() {
   };
 
   return (
-    <main className="relative overflow-hidden">
-      <AmbientBlobs
-        blobs={[
-          { color: 'green', size: 280, top: '8%', right: '8%' },
-          { color: 'blue', size: 240, top: '50%', left: '5%' },
-          { color: 'tan', size: 220, bottom: '5%', right: '10%' },
-        ]}
-      />
-
-      <div className="relative mx-auto px-6" style={{ maxWidth: 600, padding: '80px 24px 48px' }}>
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-        >
-          <Glass variant="glow" style={{ padding: 'clamp(36px, 5vw, 52px)' }}>
-            <div className="flex justify-center mb-5">
-              <GlowLogo size={64} glow="green" />
-            </div>
-
-            <p
-              className="mb-3 text-center"
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                letterSpacing: '3px',
-                textTransform: 'uppercase',
-                color: '#1A6B4A',
-              }}
-            >
-              Book a demo
-            </p>
-
-            <h1
-              className="display-heading text-brand-text mb-4 text-center"
-              style={{ fontSize: 'clamp(26px, 4vw, 32px)' }}
-            >
-              See Pro OS in your business.
-            </h1>
-
-            <p
-              className="text-brand-text-sec mb-8 text-center mx-auto"
-              style={{ fontSize: 14, lineHeight: 1.7, maxWidth: '46ch' }}
-            >
-              A 30-minute conversation. We'll show you what Pro OS looks like deployed to your operation specifically. No generic demo. No deck.
-            </p>
-
-            {!submitted ? (
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {FIELDS.map((field) => (
-                  <div key={field.id}>
-                    <label
-                      htmlFor={field.id}
-                      className="block mb-2"
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 600,
-                        letterSpacing: '1px',
-                        textTransform: 'uppercase',
-                        color: '#4D4060',
-                      }}
-                    >
-                      {field.label}
-                    </label>
-                    <input
-                      id={field.id}
-                      type={field.type}
-                      required
-                      value={form[field.id]}
-                      onChange={(e) => handleChange(field.id, e.target.value)}
-                      placeholder={field.placeholder}
-                      style={inputStyle}
-                      onFocus={(e) => {
-                        e.currentTarget.style.borderColor = '#1A6B4A';
-                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(45,139,85,0.1)';
-                      }}
-                      onBlur={(e) => {
-                        e.currentTarget.style.borderColor = 'rgba(26,107,74,0.15)';
-                        e.currentTarget.style.boxShadow = 'none';
-                      }}
-                    />
-                  </div>
-                ))}
-
-                <button type="submit" className="btn-primary-emerald w-full">
-                  Book your demo
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-
-                <p
-                  className="text-center"
-                  style={{ fontSize: 11, color: '#8A7DA0', letterSpacing: '0.3px' }}
-                >
-                  {/* Form POST: stubbed. Wire to /api/demo (Resend or webhook) when ready. */}
-                  We respond within one business day.
-                </p>
-              </form>
-            ) : (
-              <div className="text-center">
-                <div className="flex justify-center mb-5" style={{ color: '#1A6B4A' }}>
-                  <CheckCircle2 className="w-10 h-10" />
+    <InnerPageShell
+      eyebrow="Book a demo"
+      headline="See Oaisis OS in your company."
+      subhead="A 30-minute conversation. We'll show you what Oaisis OS looks like deployed to your operation specifically. No generic demo. No deck."
+      maxWidth={760}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="mx-auto"
+        style={{ maxWidth: 600 }}
+      >
+        <Glass variant="glow" style={{ padding: 'clamp(36px, 5vw, 52px)' }}>
+          {!submitted ? (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {FIELDS.map((field) => (
+                <div key={field.id}>
+                  <label
+                    htmlFor={field.id}
+                    className="block mb-2"
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      letterSpacing: '1px',
+                      textTransform: 'uppercase',
+                      color: '#2563A8',
+                      fontFamily: "'Inter', sans-serif",
+                    }}
+                  >
+                    {field.label}
+                  </label>
+                  <input
+                    id={field.id}
+                    type={field.type}
+                    required
+                    value={form[field.id]}
+                    onChange={(e) => handleChange(field.id, e.target.value)}
+                    placeholder={field.placeholder}
+                    style={inputStyle}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#2563A8';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,168,0.12)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(37,99,168,0.15)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  />
                 </div>
-                <p
-                  className="mb-3"
-                  style={{ fontSize: 18, fontWeight: 400, color: '#0F4D35', letterSpacing: '-0.2px' }}
-                >
-                  Got it, {form.name.split(' ')[0] || 'there'}.
-                </p>
-                <p className="text-brand-text-sec mb-2" style={{ fontSize: 14, lineHeight: 1.7 }}>
-                  Pick a time below — or we'll reach out within one business day.
-                </p>
-              </div>
-            )}
-          </Glass>
-        </motion.div>
-      </div>
+              ))}
 
-      <div className="relative mx-auto px-6" style={{ maxWidth: 760, padding: '24px 24px 100px' }}>
+              <button type="submit" className="btn-primary-emerald w-full">
+                Book your demo
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <p
+                className="text-center"
+                style={{
+                  fontSize: 12,
+                  color: 'rgba(15,42,74,0.6)',
+                  letterSpacing: '0.3px',
+                  fontFamily: "'Inter', sans-serif",
+                }}
+              >
+                We respond within one business day.
+              </p>
+            </form>
+          ) : (
+            <div className="text-center">
+              <div className="flex justify-center mb-5" style={{ color: '#2563A8' }}>
+                <CheckCircle2 className="w-10 h-10" />
+              </div>
+              <p
+                className="mb-3"
+                style={{
+                  fontSize: 20,
+                  fontWeight: 600,
+                  color: '#0F2A4A',
+                  letterSpacing: '-0.2px',
+                  fontFamily: "'Inter', sans-serif",
+                }}
+              >
+                Got it, {form.name.split(' ')[0] || 'there'}.
+              </p>
+              <p
+                style={{
+                  fontSize: 15,
+                  lineHeight: 1.7,
+                  color: 'rgba(15,42,74,0.78)',
+                  fontFamily: "'Inter', sans-serif",
+                }}
+              >
+                Pick a time below — or we'll reach out within one business day.
+              </p>
+            </div>
+          )}
+        </Glass>
+      </motion.div>
+
+      <div className="mx-auto" style={{ maxWidth: 760, marginTop: 32 }}>
         <div
           id="calendar-embed"
           data-provider="cal.com"
@@ -184,25 +165,6 @@ export default function DemoPage() {
             transition: 'min-height 0.4s ease',
           }}
         >
-          {/*
-            CALENDAR EMBED SLOT
-            ──────────────────
-            When Chris picks a provider, replace this block.
-
-            Cal.com option:
-              <Cal calLink="oaisis/demo" config={{layout: 'month_view'}} />
-              (requires `@calcom/embed-react` install + Cal init in main.tsx)
-
-            Calendly option:
-              <div className="calendly-inline-widget"
-                   data-url="https://calendly.com/oaisis/demo"
-                   style={{ minWidth: '320px', height: '630px' }} />
-              (requires script tag https://assets.calendly.com/assets/external/widget.js)
-
-            Fallback (no JS embed): a styled <a href={calendarUrl} className="btn-primary-emerald" target="_blank" />
-
-            For now, show a styled placeholder so the page reads complete.
-          */}
           <Glass
             variant="default"
             className="w-full text-center"
@@ -211,32 +173,57 @@ export default function DemoPage() {
             <p
               className="mb-3"
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 600,
                 letterSpacing: '3px',
                 textTransform: 'uppercase',
                 color: '#2563A8',
+                fontFamily: "'Inter', sans-serif",
               }}
             >
               Calendar
             </p>
             {submitted ? (
               <>
-                <p className="text-brand-text mb-2" style={{ fontSize: 15, fontWeight: 500 }}>
+                <p
+                  className="mb-2"
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: '#0F2A4A',
+                    fontFamily: "'Inter', sans-serif",
+                  }}
+                >
                   Calendar embed loads here.
                 </p>
-                <p className="text-brand-text-sec mx-auto" style={{ fontSize: 13, lineHeight: 1.7, maxWidth: '52ch' }}>
+                <p
+                  className="mx-auto"
+                  style={{
+                    fontSize: 13,
+                    lineHeight: 1.7,
+                    color: 'rgba(15,42,74,0.7)',
+                    maxWidth: '52ch',
+                    fontFamily: "'Inter', sans-serif",
+                  }}
+                >
                   Cal.com or Calendly — wired before public launch. Until then, the form above routes to our inbox and we reply within one business day.
                 </p>
               </>
             ) : (
-              <p className="text-brand-text-sec" style={{ fontSize: 13, lineHeight: 1.7 }}>
+              <p
+                style={{
+                  fontSize: 13,
+                  lineHeight: 1.7,
+                  color: 'rgba(15,42,74,0.7)',
+                  fontFamily: "'Inter', sans-serif",
+                }}
+              >
                 Fill out the form above to reveal time slots.
               </p>
             )}
           </Glass>
         </div>
       </div>
-    </main>
+    </InnerPageShell>
   );
 }

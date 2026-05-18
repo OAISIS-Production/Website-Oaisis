@@ -14,10 +14,10 @@ interface ClosingBandProps {
 }
 
 export default function ClosingBand({
-  photoSrc = '/assets/images/oasis.jpg',
+  photoSrc = '/photography/tropical-oasis.jpeg',
   photoPosition = 'center 35%',
   logoSize = 80,
-  logoGlow = 'green',
+  logoGlow = 'deep',
   headline,
   cta,
   minHeight = '58vh',

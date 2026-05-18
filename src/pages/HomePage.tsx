@@ -3,32 +3,42 @@ import ManifestoSection from '../components/sections/ManifestoSection';
 import AIOperatingSystemSection from '../components/sections/AIOperatingSystemSection';
 import CapabilitiesSection from '../components/sections/CapabilitiesSection';
 import IndustriesSection from '../components/sections/IndustriesSection';
+import ManufacturingSection from '../components/sections/ManufacturingSection';
 import CustomerProofSection from '../components/sections/CustomerProofSection';
-import DemoMomentSection from '../components/sections/DemoMomentSection';
+import BreathMoment from '../components/sections/BreathMoment';
 import FinalOasis from '../components/oasis/FinalOasis';
 
-/**
- * v3 HomePage — the scroll journey.
- *
- * For the GATE 1 review, this renders the new Hero (Three.js glass wordmark
- * + sky + parallax clouds) at the top and the Final Oasis landing at the
- * bottom. Middle sections (manifesto / AI OS pinned story / capabilities /
- * industries / proof / demo moment) will land in subsequent phases.
- *
- * A minimal transition block between hero and oasis keeps the page coherent
- * for the gate review — warm sand fading toward emerald — so the journey
- * shape reads even without the middle content.
- */
+// v13.4 — sections sit transparently on the body-level continuous gradient.
+// Only the hero (video), Industries (deep accent w/ masks), and Oasis (photo)
+// have their own backgrounds. No more per-section gradients → no seams.
 export default function HomePage() {
   return (
     <>
       <HeroSection />
       <ManifestoSection />
+      <BreathMoment
+        lines={['The complete operating layer for your company.']}
+        background="transparent"
+        textColor="#FFFFFF"
+        cloudOpacity={0.30}
+      />
       <AIOperatingSystemSection />
       <CapabilitiesSection />
+      <BreathMoment
+        lines={['Finally.']}
+        background="transparent"
+        textColor="#FFFFFF"
+        cloudOpacity={0.30}
+      />
       <IndustriesSection />
+      <ManufacturingSection />
       <CustomerProofSection />
-      <DemoMomentSection />
+      <BreathMoment
+        lines={['This is what arrival feels like.']}
+        background="transparent"
+        textColor="#FFFFFF"
+        cloudOpacity={0.30}
+      />
       <FinalOasis />
     </>
   );

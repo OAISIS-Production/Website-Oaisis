@@ -1,106 +1,121 @@
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import Clouds from '../ui/Clouds';
+import { gsap, ScrollTrigger } from '../../lib/scroll';
 
+// Smoother field-quote reveal — GSAP timeline tied to one ScrollTrigger on
+// the section wrapper.
+//   Stage 1: blockquote body — opacity + y + blur clear, 1.6s power3.out
+//   Stage 2: attribution — opacity + y, 1.0s power2.out, '-=1.0' (overlaps)
+//   Stage 3: "From the field" eyebrow (decorative) — opacity + scaleY 0.6→1,
+//            1.2s power2.out, at timeline start (cascades alongside body).
+// onComplete strips GSAP's inline overrides so each element settles onto
+// its CSS-defined final style (font-size clamp, letter-spacing, etc.) with
+// no visible inline-style snap. The .gsap-reveal-init class hides each
+// element pre-reveal and is removed in the same onComplete cleanup.
 export default function CustomerProofSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const eyebrowRef = useRef<HTMLParagraphElement>(null);
+  const quoteRef = useRef<HTMLQuoteElement>(null);
+
+  useEffect(() => {
+    if (!sectionRef.current || !quoteRef.current || !eyebrowRef.current) return;
+    const section = sectionRef.current;
+    const eyebrow = eyebrowRef.current;
+    const quote = quoteRef.current;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) {
+      [eyebrow, quote].forEach((el) => {
+        el.classList.remove('gsap-reveal-init');
+      });
+      return;
+    }
+    const ctx = gsap.context(() => {
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 70%',
+          end: 'top 30%',
+          toggleActions: 'play none none reverse',
+        },
+        onComplete: () => {
+          gsap.set([eyebrow, quote], {
+            clearProps: 'transform,filter,opacity,scaleY,y',
+          });
+          [eyebrow, quote].forEach((el) =>
+            el.classList.remove('gsap-reveal-init')
+          );
+        },
+      })
+        .fromTo(
+          eyebrow,
+          { opacity: 0, scaleY: 0.6, transformOrigin: '50% 100%' },
+          { opacity: 1, scaleY: 1, duration: 1.2, ease: 'power2.out' },
+          0
+        )
+        .fromTo(
+          quote,
+          { opacity: 0, y: 30, filter: 'blur(10px)' },
+          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.6, ease: 'power3.out' },
+          0
+        );
+    }, section);
+    return () => {
+      ctx.revert();
+      ScrollTrigger.refresh();
+    };
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       id="proof"
       className="relative w-full overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, #40A865 0%, #2D8B55 100%)',
-        padding: 'clamp(64px, 10vh, 120px) 24px',
-        minHeight: '50vh',
+        minHeight: '80vh',
+        background: 'transparent',
       }}
+      aria-label="From the field"
     >
-      <div className="max-w-4xl mx-auto text-center">
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          style={{
-            fontSize: 10,
-            fontWeight: 600,
-            letterSpacing: '3.5px',
-            textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.6)',
-            marginBottom: 14,
-          }}
-        >
-          Operators choosing Pro OS
-        </motion.p>
+      <Clouds opacity={0.32} />
 
-        <motion.h2
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          style={{
-            fontSize: 'clamp(22px, 3.2vw, 30px)',
-            fontWeight: 200,
-            letterSpacing: '-0.3px',
-            color: 'rgba(255,255,255,0.92)',
-            lineHeight: 1.3,
-            marginBottom: 28,
-          }}
-        >
-          Coming out of stealth.
-          <br />
-          Demos available now.
-        </motion.h2>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
-        >
-          <Link
-            to="/demo"
-            className="inline-flex items-center gap-2 transition-all"
+      <div
+        className="relative flex flex-col items-center justify-center text-center px-6"
+        style={{ minHeight: '80vh', zIndex: 3, padding: 'clamp(80px, 12vh, 140px) 24px' }}
+      >
+        <div style={{ maxWidth: 1100 }}>
+          <p
+            ref={eyebrowRef}
+            className="gsap-reveal-init"
             style={{
-              padding: '12px 22px',
-              borderRadius: 999,
-              background: 'rgba(255,255,255,0.12)',
-              border: '1px solid rgba(255,255,255,0.45)',
-              color: '#FFFFFF',
-              fontSize: 13,
-              fontWeight: 500,
-              letterSpacing: '0.2px',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              textDecoration: 'none',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.22)';
-              (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.12)';
-              (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(0)';
+              fontSize: 14,
+              fontWeight: 600,
+              letterSpacing: '0.4em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.85)',
+              marginBottom: 44,
+              fontFamily: "'Inter', sans-serif",
             }}
           >
-            Book the early-access demo
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </motion.div>
+            From the field
+          </p>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.6, delay: 0.45 }}
-          style={{
-            fontSize: 11,
-            color: 'rgba(255,255,255,0.5)',
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            marginTop: 26,
-          }}
-        >
-          Customer logos land here as the early-access cohort goes public
-        </motion.p>
+          <blockquote
+            ref={quoteRef}
+            className="bolder-on-scroll gsap-reveal-init"
+            style={{
+              fontSize: 'clamp(40px, 5vw, 84px)',
+              fontWeight: 600,
+              color: '#FFFFFF',
+              lineHeight: 1.15,
+              letterSpacing: '-0.03em',
+              margin: 0,
+              fontFamily: "'Inter', sans-serif",
+            }}
+          >
+            “We replaced four tools, three spreadsheets, and two anxious Sunday mornings.”
+          </blockquote>
+
+        </div>
       </div>
     </section>
   );

@@ -1,220 +1,354 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Calendar, Mail, DollarSign, Database } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { TrendingUp, Settings2, DollarSign, MessageSquare, BarChart3, Plug } from 'lucide-react';
 import GlowLogo from '../ui/GlowLogo';
-import { gsap, ScrollTrigger } from '../../lib/scroll';
+import Clouds from '../ui/Clouds';
+import AutopilotHeadline from '../demos/AutopilotHeadline';
 
-const APPS = [
-  { id: 'crm', label: 'CRM', icon: Users, x: 50, y: 7 },
-  { id: 'calendar', label: 'Calendar', icon: Calendar, x: 88, y: 30 },
-  { id: 'inbox', label: 'Inbox', icon: Mail, x: 78, y: 80 },
-  { id: 'accounting', label: 'Accounting', icon: DollarSign, x: 22, y: 80 },
-  { id: 'database', label: 'Database', icon: Database, x: 12, y: 30 },
+// Six icons evenly spaced at 60° around a 500px-diameter dashed circle
+// centered in a 600px container. Angles in degrees, clockwise from 12 o'clock.
+interface DiagramApp {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  angleDeg: number;
+  tip: string;
+}
+const APPS: DiagramApp[] = [
+  { id: 'sales', label: 'Sales', icon: TrendingUp, angleDeg: -90, tip: 'Drafting outreach to Sarah at Acme.' },
+  { id: 'operations', label: 'Operations', icon: Settings2, angleDeg: -30, tip: 'Invoice 2841 matched + approved.' },
+  { id: 'finance', label: 'Finance', icon: DollarSign, angleDeg: 30, tip: 'Vendor X $4.2K/mo savings flagged.' },
+  { id: 'support', label: 'Support', icon: MessageSquare, angleDeg: 90, tip: 'Replied to Jamie about delivery date.' },
+  { id: 'integrations', label: 'Integrations', icon: Plug, angleDeg: 150, tip: 'New CRM connection live.' },
+  { id: 'analytics', label: 'Analytics', icon: BarChart3, angleDeg: 210, tip: "Revenue up 18% week over week." },
 ];
 
+// 600×600 SVG. Center at (300,300). Icons at radius 250 — one source of
+// truth used by icons, connector lines, labels, AND tooltip placement so
+// they all align exactly.
+const DIAGRAM_SIZE = 600;
+const DIAGRAM_CENTER = DIAGRAM_SIZE / 2;
+const DIAGRAM_RADIUS = 250;
+const ICON_SIZE = 64;          // px — icon tile w/h
+const ICON_HALF = ICON_SIZE / 2; // px — icon's radius used to truncate lines
+const CENTER_LOGO_RADIUS = 50; // GlowLogo size 100 → radius 50
+const LINE_GAP = 6;            // px — line stops short of icon/logo edge by this much
+const LABEL_OFFSET = 12;       // px below icon bottom edge
+const TOOLTIP_GAP = 14;        // px between icon edge and tooltip card
+function polarPos(angleDeg: number, r: number) {
+  const a = (angleDeg * Math.PI) / 180;
+  return { x: DIAGRAM_CENTER + r * Math.cos(a), y: DIAGRAM_CENTER + r * Math.sin(a) };
+}
+// Cosine of an icon's angle — positive ⇒ icon on the right half of the
+// diagram, negative ⇒ left half. Top/bottom icons have cos≈0; epsilon below
+// routes them to the right side so they never clip the diagram's left edge.
+function cosOf(angleDeg: number) {
+  return Math.cos((angleDeg * Math.PI) / 180);
+}
+
+// v13.5 — single state, no body paragraph. The diagram does the talking.
 const STATES = [
   {
-    eyebrow: 'WHAT IT IS',
-    heading: 'Think about how a business runs today.',
-    body: "Your CRM holds the customers. Your accounting software holds the money. Your calendar holds the schedule. Your inbox holds the conversations. Your team holds everything that hasn't been written down yet. None of them talk to each other. You're the integration.",
-  },
-  {
-    eyebrow: 'WHAT IT BECOMES',
-    heading: 'Pro OS is the integration.',
-    body: "It connects to all of it — every tool, every data source, every channel — and runs underneath your business as a single, intelligent system. It doesn't replace your software. It operates it.",
-  },
-  {
     eyebrow: 'THE NEW LAYER',
-    heading: "Your business, fully online.",
-    body: 'The same way an operating system runs everything underneath your laptop without you thinking about it, Pro OS runs everything underneath your business. Ask it anything and it answers. Tell it anything and it does it. Leave it alone and it keeps working.',
+    heading: 'Your company. On autopilot.',
   },
 ];
 
-function AppTile({
-  app,
-  active,
-  index,
-}: {
-  app: (typeof APPS)[number];
-  active: boolean;
-  index: number;
-}) {
-  const Icon = app.icon;
+// Geometric radial diagram — Oaisis logo at center, 6 icons at exact 60°
+// intervals on a dashed 500px circle, static connector lines from each icon
+// to center, single tooltip cycling every 2.5s with its own connector to the
+// active icon.
+function RadialDiagram({ active }: { active: number }) {
   return (
-    <motion.div
-      className="absolute"
+    <div
+      className="relative"
       style={{
-        left: `${app.x}%`,
-        top: `${app.y}%`,
-        transform: 'translate(-50%, -50%)',
-        pointerEvents: 'none',
+        width: 'min(600px, 92vw)',
+        aspectRatio: '1 / 1',
       }}
-      initial={false}
-      animate={{
-        opacity: 1,
-        scale: active ? 0.9 : 1,
-      }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: index * 0.05 }}
     >
-      <div
-        style={{
-          width: 'clamp(54px, 7vw, 76px)',
-          height: 'clamp(54px, 7vw, 76px)',
-          borderRadius: 14,
-          background: 'rgba(255,255,255,0.7)',
-          border: '1px solid rgba(255,255,255,0.85)',
-          boxShadow: '0 6px 22px rgba(160,128,80,0.10), inset 0 1px 0 rgba(255,255,255,0.7)',
-          backdropFilter: 'blur(18px)',
-          WebkitBackdropFilter: 'blur(18px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#1A6B4A',
-        }}
+      <svg
+        viewBox={`0 0 ${DIAGRAM_SIZE} ${DIAGRAM_SIZE}`}
+        className="absolute inset-0 w-full h-full"
+        aria-hidden="true"
       >
-        <Icon className="w-6 h-6" />
-      </div>
-      <p
-        className="text-center mt-2"
-        style={{
-          fontSize: 9,
-          fontWeight: 600,
-          letterSpacing: '2px',
-          textTransform: 'uppercase',
-          color: '#4D4060',
-          opacity: 0.75,
-        }}
-      >
-        {app.label}
-      </p>
-    </motion.div>
-  );
-}
-
-function ConnectionLines({ visible }: { visible: boolean }) {
-  return (
-    <svg
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      viewBox="0 0 100 100"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="connGrad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="rgba(26,107,74,0.85)" />
-          <stop offset="100%" stopColor="rgba(91,160,212,0.85)" />
-        </linearGradient>
-      </defs>
-      {APPS.map((app) => (
-        <motion.line
-          key={app.id}
-          x1={app.x}
-          y1={app.y}
-          x2={50}
-          y2={50}
-          stroke="url(#connGrad)"
-          strokeWidth={0.25}
-          strokeLinecap="round"
-          strokeDasharray="1 2"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{
-            pathLength: visible ? 1 : 0,
-            opacity: visible ? 0.85 : 0,
-          }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+        {/* Dashed boundary circle */}
+        <circle
+          cx={DIAGRAM_CENTER}
+          cy={DIAGRAM_CENTER}
+          r={DIAGRAM_RADIUS}
+          fill="none"
+          stroke="rgba(255,255,255,0.35)"
+          strokeWidth={1.5}
+          strokeDasharray="4 6"
         />
-      ))}
-    </svg>
+        {/* Connector lines — TERMINATE just outside each endpoint:
+            • icon-side end: r = DIAGRAM_RADIUS − ICON_HALF − LINE_GAP
+              (just before icon's edge, NOT passing through the icon)
+            • center-side end: r = CENTER_LOGO_RADIUS + LINE_GAP
+              (just outside the center glass logo)                              */}
+        {APPS.map((app, i) => {
+          const start = polarPos(app.angleDeg, DIAGRAM_RADIUS - ICON_HALF - LINE_GAP);
+          const end = polarPos(app.angleDeg, CENTER_LOGO_RADIUS + LINE_GAP);
+          const isActive = i === active;
+          return (
+            <line
+              key={app.id}
+              x1={start.x}
+              y1={start.y}
+              x2={end.x}
+              y2={end.y}
+              stroke={isActive ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)'}
+              strokeWidth={isActive ? 2 : 1}
+              style={{ transition: 'stroke 350ms ease, stroke-width 350ms ease' }}
+            />
+          );
+        })}
+      </svg>
+
+      {/* Icons + tooltips — each icon's CENTER sits exactly on the polar
+          coordinate. The tooltip is a SIBLING of the icon inside this same
+          wrapper so they move together; it sits on the side of the icon
+          AWAY from the diagram edge, chosen via the icon's cos(angle):
+          icons on the right half → tooltip on the LEFT of the icon;
+          icons on the left half → tooltip on the RIGHT. Top/bottom icons
+          (cos≈0) default to the right.                                    */}
+      {APPS.map((app, i) => {
+        const p = polarPos(app.angleDeg, DIAGRAM_RADIUS);
+        const Icon = app.icon;
+        const isActive = i === active;
+        const leftPct = (p.x / DIAGRAM_SIZE) * 100;
+        const topPct = (p.y / DIAGRAM_SIZE) * 100;
+        // tooltipOnLeft = true ⇒ tooltip extends to the LEFT of the icon
+        const tooltipOnLeft = cosOf(app.angleDeg) > 0.05;
+        return (
+          <div
+            key={app.id}
+            className="absolute"
+            style={{
+              left: `${leftPct}%`,
+              top: `${topPct}%`,
+              transform: `translate(-50%, -50%)`,
+              width: ICON_SIZE,
+              height: ICON_SIZE,
+              pointerEvents: 'none',
+            }}
+          >
+            {/* Icon tile fills the positioned container exactly → its center
+                is at the polar coord. Halo + glow stack underneath. */}
+            <div
+              className="relative radial-icon-tile"
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: 16,
+                background: isActive ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.12)',
+                border: '1px solid rgba(255,255,255,0.55)',
+                boxShadow:
+                  isActive
+                    ? '0 0 32px rgba(255,255,255,0.45), inset 0 0 22px rgba(255,255,255,0.28), 0 8px 24px rgba(15,42,74,0.30)'
+                    : '0 0 22px rgba(255,255,255,0.28), inset 0 0 18px rgba(255,255,255,0.18), 0 6px 18px rgba(15,42,74,0.22)',
+                backdropFilter: 'blur(18px)',
+                WebkitBackdropFilter: 'blur(18px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#FFFFFF',
+                transition:
+                  'transform 200ms ease, background 300ms ease, box-shadow 300ms ease',
+                transform: isActive ? 'scale(1.05)' : 'scale(1)',
+              }}
+            >
+              {/* Outer halo — soft white radial behind icon */}
+              <div
+                aria-hidden
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  borderRadius: 16,
+                  background:
+                    'radial-gradient(circle at center, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 70%)',
+                  filter: 'blur(20px)',
+                  opacity: 0.4,
+                  transform: 'scale(1.4)',
+                  zIndex: -1,
+                }}
+              />
+              <Icon
+                className="w-7 h-7"
+                style={{
+                  strokeWidth: 2,
+                  filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.6))',
+                }}
+              />
+            </div>
+            {/* Label sits LABEL_OFFSET px below the icon's bottom edge,
+                centered on the icon's x. Absolute positioning anchors it
+                to this container's bottom; whiteSpace nowrap so multi-word
+                labels (INTEGRATIONS) stay on one line. */}
+            <p
+              className="absolute text-center"
+              style={{
+                left: '50%',
+                top: '100%',
+                transform: 'translateX(-50%)',
+                marginTop: LABEL_OFFSET,
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: isActive ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.78)',
+                transition: 'color 300ms ease',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {app.label}
+            </p>
+            {/* Tooltip — sibling of icon, adjacent to it. Visible only when
+                this icon is active; uses tooltipOnLeft to anchor to the icon
+                edge nearest the diagram center, so it never extends off the
+                diagram or overlaps the center logo. */}
+            <motion.div
+              className="absolute pointer-events-none"
+              style={{
+                top: '50%',
+                ...(tooltipOnLeft
+                  ? { right: `calc(100% + ${TOOLTIP_GAP}px)` }
+                  : { left: `calc(100% + ${TOOLTIP_GAP}px)` }),
+                transform: 'translateY(-50%)',
+                zIndex: 4,
+                whiteSpace: 'nowrap',
+              }}
+              animate={{
+                opacity: isActive ? 1 : 0,
+                scale: isActive ? 1 : 0.94,
+              }}
+              transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: 12,
+                  background: 'rgba(255,255,255,0.96)',
+                  border: '1px solid rgba(255,255,255,0.9)',
+                  boxShadow: '0 6px 22px rgba(15,42,74,0.22)',
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: '#0F2A4A',
+                  fontFamily: "'Inter', sans-serif",
+                }}
+              >
+                {app.tip}
+              </div>
+            </motion.div>
+          </div>
+        );
+      })}
+
+      {/* Center logo */}
+      <div
+        className="absolute"
+        style={{
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+          pointerEvents: 'none',
+        }}
+      >
+        <GlowLogo size={100} glow="white" />
+      </div>
+
+    </div>
   );
 }
 
-function YourBusinessRing({ visible }: { visible: boolean }) {
+// Mobile equivalent of the RadialDiagram — same 6 categories, same content
+// (icon + label + tip), but stacked vertically. The active row is highlighted
+// to match the cycling animation that drives the desktop tooltip swap. All
+// rows render simultaneously since there's no spatial-overflow risk on a
+// single-column layout.
+function MobileCapabilityList({ active }: { active: number }) {
   return (
-    <motion.svg
-      className="absolute pointer-events-none"
-      style={{ inset: '-6%', width: '112%', height: '112%' }}
-      viewBox="0 0 100 100"
-      aria-hidden="true"
-      initial={false}
-      animate={{ opacity: visible ? 1 : 0, scale: visible ? 1 : 0.96 }}
-      transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-    >
-      <circle
-        cx={50}
-        cy={50}
-        r={48}
-        fill="none"
-        stroke="rgba(26,107,74,0.45)"
-        strokeWidth={0.18}
-        strokeDasharray="1.2 1.2"
-      />
-      <text
-        x={50}
-        y={3.5}
-        fontSize={2.2}
-        fontWeight={600}
-        letterSpacing={0.5}
-        textAnchor="middle"
-        fill="rgba(15,77,53,0.7)"
-        style={{ textTransform: 'uppercase', fontFamily: "'Outfit', sans-serif" }}
-      >
-        ◆ YOUR BUSINESS ◆
-      </text>
-    </motion.svg>
+    <div className="flex flex-col gap-3 w-full" style={{ maxWidth: 480, margin: '0 auto' }}>
+      {APPS.map((app, i) => {
+        const Icon = app.icon;
+        const isActive = i === active;
+        return (
+          <div
+            key={app.id}
+            className="flex items-start gap-4"
+            style={{
+              padding: '14px 16px',
+              borderRadius: 14,
+              background: isActive ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${isActive ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.10)'}`,
+              transition: 'background 300ms ease, border-color 300ms ease',
+            }}
+          >
+            <div
+              className="flex-shrink-0 inline-flex items-center justify-center"
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 12,
+                background: isActive ? 'rgba(255,255,255,0.20)' : 'rgba(255,255,255,0.10)',
+                border: '1px solid rgba(255,255,255,0.25)',
+                color: '#FFFFFF',
+                transition: 'background 300ms ease',
+              }}
+            >
+              <Icon className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: isActive ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.75)',
+                  fontFamily: "'Inter', sans-serif",
+                  marginBottom: 4,
+                }}
+              >
+                {app.label}
+              </p>
+              <p
+                style={{
+                  fontSize: 14,
+                  lineHeight: 1.4,
+                  color: 'rgba(255,255,255,0.85)',
+                  fontFamily: "'Inter', sans-serif",
+                  margin: 0,
+                }}
+              >
+                {app.tip}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
 export default function AIOperatingSystemSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const pinRef = useRef<HTMLDivElement>(null);
-  const [stateIndex, setStateIndex] = useState(0);
+  const [activeIcon, setActiveIcon] = useState(0);
 
+  // Continuous tooltip cycle. Mobile interval is 3500ms (vs 2000ms desktop)
+  // to spread out the re-render cadence — the user wants the cycle visible
+  // on mobile, just less frequent than desktop so it doesn't compound with
+  // scroll work.
   useEffect(() => {
-    if (!sectionRef.current || !pinRef.current) return;
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
-
-    if (prefersReduced || isMobile) {
-      // No pinning: show the final state. Mobile gets a normal-flow card; the
-      // section collapses to one screen instead of a 300vh pinned story.
-      setStateIndex(2);
-      return;
-    }
-
-    const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: 'top top',
-        end: '+=200%',
-        pin: pinRef.current,
-        pinSpacing: true,
-        scrub: 0.5,
-        onUpdate: ({ progress }) => {
-          if (progress < 0.34) setStateIndex(0);
-          else if (progress < 0.7) setStateIndex(1);
-          else setStateIndex(2);
-        },
-      });
-    }, sectionRef);
-
-    return () => {
-      ctx.revert();
-      ScrollTrigger.refresh();
-    };
+    const interval = isMobile ? 3500 : 2000;
+    const t = window.setInterval(() => {
+      setActiveIcon((i) => (i + 1) % APPS.length);
+    }, interval);
+    return () => window.clearInterval(t);
   }, []);
 
-  // Use a natural-height section on mobile / reduced motion; only set the 300vh
-  // scroll length on desktop where pinning actually happens.
-  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
-  const prefersReduced =
-    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const tallSection = !isMobile && !prefersReduced;
-
-  const current = STATES[stateIndex];
-  const showLogo = stateIndex >= 1;
-  const showLines = stateIndex >= 1;
-  const showRing = stateIndex >= 2;
-  const showSnippets = stateIndex >= 2;
+  const current = STATES[0];
 
   return (
     <section
@@ -222,159 +356,44 @@ export default function AIOperatingSystemSection() {
       id="what-it-is"
       className="relative w-full"
       style={{
-        background:
-          'linear-gradient(180deg, #FAF7F0 0%, #EDE2CC 50%, #DCC9A0 100%)',
-        height: tallSection ? '300vh' : 'auto',
-        paddingTop: tallSection ? 0 : 'clamp(80px, 12vh, 120px)',
-        paddingBottom: tallSection ? 0 : 'clamp(80px, 12vh, 120px)',
+        background: 'transparent',
+        minHeight: '90vh',
+        padding: 'clamp(72px, 10vh, 120px) 0',
       }}
     >
-      <div
-        ref={pinRef}
-        className="relative w-full overflow-hidden"
-        style={{ height: tallSection ? '100vh' : 'auto', minHeight: tallSection ? undefined : 480 }}
-      >
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 hidden md:flex items-center gap-2 pointer-events-none">
-          {STATES.map((_, i) => (
-            <span
-              key={i}
-              className="block rounded-full transition-all duration-300"
-              style={{
-                width: i === stateIndex ? 28 : 16,
-                height: 3,
-                background: i === stateIndex ? '#1A6B4A' : 'rgba(74,64,96,0.25)',
-              }}
-            />
-          ))}
-        </div>
+      <div className="relative w-full overflow-hidden">
+        <Clouds opacity={0.22} />
 
-        <div className="relative w-full h-full grid md:grid-cols-[42%_58%] grid-rows-1 items-center px-6 md:px-12 max-w-7xl mx-auto gap-10">
-          <div className="relative h-full flex items-center">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={stateIndex}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                style={{ maxWidth: 460 }}
+        <div className="relative w-full h-full grid grid-cols-1 md:grid-cols-[36%_64%] grid-rows-1 items-center px-6 md:px-12 max-w-7xl mx-auto gap-10">
+          <div className="aiops-headline-col relative h-full flex items-center" style={{ minHeight: 'min(80vh, 720px)' }}>
+            <div style={{ maxWidth: 460 }}>
+              <p
+                className="mb-5"
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  letterSpacing: '0.35em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.85)',
+                  fontFamily: "'Inter', sans-serif",
+                }}
               >
-                <p
-                  className="mb-5"
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 600,
-                    letterSpacing: '3px',
-                    textTransform: 'uppercase',
-                    color: '#1A6B4A',
-                  }}
-                >
-                  {current.eyebrow}
-                </p>
-                <h2
-                  className="mb-6"
-                  style={{
-                    fontSize: 'clamp(26px, 3.4vw, 38px)',
-                    fontWeight: 200,
-                    letterSpacing: '-0.4px',
-                    color: '#2A1F38',
-                    lineHeight: 1.2,
-                  }}
-                >
-                  {current.heading}
-                </h2>
-                <p
-                  style={{
-                    fontSize: 'clamp(14px, 1.4vw, 16px)',
-                    lineHeight: 1.75,
-                    fontWeight: 300,
-                    color: '#4D4060',
-                  }}
-                >
-                  {current.body}
-                </p>
-              </motion.div>
-            </AnimatePresence>
+                {current.eyebrow}
+              </p>
+              <AutopilotHeadline />
+            </div>
           </div>
 
-          <div className="relative h-full flex items-center justify-center">
-            <div
-              className="relative"
-              style={{
-                width: 'min(520px, 90%)',
-                aspectRatio: '1 / 1',
-              }}
-            >
-              <YourBusinessRing visible={showRing} />
-              <ConnectionLines visible={showLines} />
-
-              {APPS.map((app, i) => (
-                <AppTile key={app.id} app={app} active={stateIndex >= 1} index={i} />
-              ))}
-
-              <motion.div
-                className="absolute"
-                style={{
-                  left: '50%',
-                  top: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  pointerEvents: 'none',
-                }}
-                initial={false}
-                animate={{
-                  opacity: showLogo ? 1 : 0,
-                  scale: showLogo ? 1 : 0.6,
-                }}
-                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-              >
-                <GlowLogo size={132} glow="green" />
-              </motion.div>
-
-              <AnimatePresence>
-                {showSnippets && (
-                  <>
-                    {[
-                      { txt: 'Morning brief ready.', x: '54%', y: '18%', delay: 0 },
-                      { txt: 'Drafting outreach to Sarah at Acme…', x: '12%', y: '52%', delay: 0.3 },
-                      { txt: 'Anomaly detected in Region 3.', x: '70%', y: '62%', delay: 0.6 },
-                    ].map((s, i) => (
-                      <motion.div
-                        key={i}
-                        className="absolute"
-                        style={{
-                          left: s.x,
-                          top: s.y,
-                          transform: 'translate(-50%, -50%)',
-                          pointerEvents: 'none',
-                        }}
-                        initial={{ opacity: 0, y: 8, filter: 'blur(8px)' }}
-                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                        exit={{ opacity: 0, y: -4 }}
-                        transition={{ duration: 0.5, delay: s.delay, ease: [0.16, 1, 0.3, 1] }}
-                      >
-                        <div
-                          style={{
-                            padding: '6px 12px',
-                            borderRadius: 10,
-                            background: 'rgba(255,255,255,0.78)',
-                            border: '1px solid rgba(255,255,255,0.9)',
-                            boxShadow: '0 4px 14px rgba(26,107,74,0.10)',
-                            backdropFilter: 'blur(16px)',
-                            WebkitBackdropFilter: 'blur(16px)',
-                            fontSize: 11,
-                            fontWeight: 500,
-                            color: '#0F4D35',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {s.txt}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </>
-                )}
-              </AnimatePresence>
-            </div>
+          {/* Desktop: radial diagram with absolute-positioned icons + tooltips.
+              Mobile: vertical stacked list of [icon · label · tip] rows.
+              The radial-positioned tooltips overflow viewport edges at 375px;
+              the stacked list keeps the same 6 categories and same content,
+              just arranged top-to-bottom for narrow screens. */}
+          <div className="hidden md:flex relative h-full items-center justify-center" style={{ minHeight: 'min(80vh, 720px)' }}>
+            <RadialDiagram active={activeIcon} />
+          </div>
+          <div className="md:hidden relative w-full">
+            <MobileCapabilityList active={activeIcon} />
           </div>
         </div>
       </div>

@@ -25,25 +25,26 @@ interface PageHeroProps {
   glassMaxWidth?: number;
 }
 
+// v13 palette — all overlays in the blue family.
 const OVERLAYS: Record<NonNullable<PageHeroProps['overlay']>, string> = {
   default:
-    'linear-gradient(180deg, rgba(91,160,212,0.10) 0%, rgba(37,99,168,0.04) 30%, transparent 50%, rgba(200,173,126,0.10) 75%, rgba(245,239,224,0.40) 100%)',
+    'linear-gradient(180deg, rgba(91,160,212,0.18) 0%, rgba(37,99,168,0.08) 35%, transparent 55%, rgba(208,231,245,0.32) 100%)',
   warm:
-    'linear-gradient(180deg, rgba(200,173,126,0.10) 0%, rgba(237,226,204,0.18) 40%, rgba(200,173,126,0.20) 75%, rgba(245,239,224,0.50) 100%)',
+    'linear-gradient(180deg, rgba(147,197,232,0.12) 0%, rgba(91,160,212,0.18) 40%, rgba(74,139,194,0.20) 75%, rgba(208,231,245,0.48) 100%)',
   cool:
     'linear-gradient(180deg, rgba(91,160,212,0.18) 0%, rgba(37,99,168,0.08) 35%, transparent 55%, rgba(208,231,245,0.30) 100%)',
   deep:
-    'linear-gradient(180deg, rgba(12,10,24,0.20) 0%, rgba(15,77,53,0.18) 40%, rgba(15,77,53,0.30) 80%, rgba(12,10,24,0.40) 100%)',
+    'linear-gradient(180deg, rgba(15,40,72,0.30) 0%, rgba(31,79,143,0.20) 40%, rgba(37,99,168,0.28) 80%, rgba(15,40,72,0.40) 100%)',
 };
 
 export default function PageHero({
-  photoSrc = '/assets/images/oasis.jpg',
+  photoSrc = '/photography/tropical-oasis.jpeg',
   photoPosition = 'center 40%',
   overlay = 'default',
   logoSize = 160,
-  logoGlow = 'green',
+  logoGlow = 'deep',
   eyebrow,
-  eyebrowColor = '#1A6B4A',
+  eyebrowColor = '#2563A8',
   headline,
   subhead,
   ctas = [],

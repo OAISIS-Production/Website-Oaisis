@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Outfit', 'SF Pro Display', '-apple-system', 'Helvetica Neue', 'sans-serif'],
+        sans: ['Inter', 'SF Pro Display', '-apple-system', 'Helvetica Neue', 'sans-serif'],
       },
       colors: {
         // Warm Earth — Foundation

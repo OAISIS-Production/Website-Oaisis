@@ -2,34 +2,136 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================
+   CINEMATIC GLOBALS — magnetic CTAs, idle
+   pulse, and scroll-velocity blur.
+   ======================================== */
+:root {
+  --scroll-blur: 0px;
+  /* Nav geometry — the floating glass pill is 16px from viewport top, with
+     14px+36px+14px = 64px internal height = 80px nav-bottom. Eyebrow uses
+     these vars to stay 80px below the nav (= 160px from viewport top), which
+     leaves room for ≥120px between eyebrow bottom and the glass-logo top
+     once LOGO_Y_OFFSET_VH (in HeroSection.tsx) shifts the canvas frame down. */
+  --nav-top: 16px;
+  /* 12px top pad + 36px inner row + 12px bottom pad = 60px (slim glass bar). */
+  --nav-height: 60px;
+  --nav-bottom: calc(var(--nav-top) + var(--nav-height));
+  --nav-clearance: 60px;
+}
+/* Desktop-only nudge: bring the "THE INTELLIGENT ENTERPRISE" eyebrow up
+   ~20px (≈5mm) so the logo region below it has more breathing space.
+   Mobile (≤768px) keeps the 60px default so the heaven-aesthetic mobile
+   hero layout is untouched. */
+@media (min-width: 769px) {
+  :root {
+    --nav-clearance: 40px;
+  }
+}
+/* Liquid glass nav — diagonal sheen stripe layered on top of the frosted
+   blue base. The ::before pseudo emulates the moving highlight you get on
+   real glass. NO overflow:hidden here so absolutely-positioned dropdowns
+   can extend below the nav without being clipped. */
+.nav-liquid-glass {
+  position: relative;
+  isolation: isolate;
+}
+.nav-liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.10) 0%,
+    rgba(255,255,255,0) 30%,
+    rgba(255,255,255,0) 70%,
+    rgba(255,255,255,0.05) 100%
+  );
+  z-index: 0;
+}
+.nav-liquid-glass > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Smooth magnetic translation; only run when the JS sets a transform. */
+.btn-magnetic {
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              background 200ms ease, color 200ms ease, box-shadow 250ms ease,
+              filter 250ms ease, border-color 200ms ease;
+}
+/* Idle pulse — 1.5s ease — applied by the cinematic-globals hook after 4s of
+   inactivity. Resets on any interaction. */
+@keyframes cinematic-idle-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(37,99,168,0.25); }
+  50%      { transform: scale(1.03); box-shadow: 0 18px 44px rgba(37,99,168,0.42); }
+}
+.cinematic-idle-pulse { animation: cinematic-idle-pulse 1.5s ease-in-out 1; }
+
+/* Scroll-velocity blur — applied to opt-in section content via .scroll-blur-target. */
+.scroll-blur-target {
+  filter: blur(var(--scroll-blur));
+  transition: filter 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: filter;
+}
+
+/* Bolder-on-scroll — section headlines start at weight 400 and animate to
+   the section's design weight (700 by default) when scrolled into view.
+   Smooth weight transition via font-variation-settings on Inter Variable. */
+.bolder-on-scroll {
+  font-variation-settings: 'wght' 400;
+  transition: font-variation-settings 400ms cubic-bezier(0.16, 1, 0.3, 1),
+              font-weight 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.bolder-on-scroll.is-bold {
+  font-variation-settings: 'wght' 700;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
   }
 
-  body {
-    font-family: 'Outfit', 'SF Pro Display', -apple-system, 'Helvetica Neue', sans-serif;
-    color: #2A1F38;
+  /* v13.7 — html owns the continuous color so it spans the full document
+     height while body remains transparent for sections to sit on top.
+     Flat hold at #5BA0D4 from 0–22% lands the hero-bottom on the exact
+     color the hero overlay fades to. Intermediate stops (#5599CE, #4087BF,
+     #3C82BD, #5BA0D4 mid-step) cut visible banding between major stops on
+     Safari/long gradients — every adjacent stop is within ≤14 RGB units
+     of its neighbor, below the typical 8-bit banding threshold. */
+  html {
     background: linear-gradient(180deg,
-      #0C0A18 0%,
-      #0A1525 5%,
-      #1a3a5c 12%,
-      #D0E7F5 22%,
-      #F5EFE0 45%,
-      #FAF7F0 65%,
-      #FDFCF8 100%
+      #5BA0D4 0%,
+      #5BA0D4 22%,
+      #5599CE 30%,
+      #4A8BC2 45%,
+      #4087BF 55%,
+      #3C82BD 60%,
+      #2E7EB8 62%,
+      #3C82BD 68%,
+      #4087BF 75%,
+      #4A8BC2 82%,
+      #5295C9 90%,
+      #5BA0D4 100%
     );
-    background-attachment: fixed;
+    min-height: 100%;
+  }
+  body {
+    font-family: 'Inter', 'SF Pro Display', -apple-system, 'Helvetica Neue', sans-serif;
+    color: #FFFFFF;
+    background: transparent;
     min-height: 100vh;
   }
 
   ::selection {
-    background: rgba(26,107,74,0.18);
-    color: #0F4D35;
+    background: rgba(91,160,212,0.22);
+    color: #1F4F8F;
   }
 
   input, textarea {
-    @apply bg-white/60 border border-tan-light/40 text-brand-text placeholder-brand-text-muted rounded-glass shadow-sm focus:ring-emerald focus:border-emerald backdrop-blur-glass;
+    @apply bg-white/60 border border-sky-light/40 text-brand-text placeholder-brand-text-muted rounded-glass shadow-sm focus:ring-sky focus:border-sky backdrop-blur-glass;
   }
 }
 
@@ -47,9 +149,9 @@ section {
 .page-warm {
   background: linear-gradient(180deg,
     #D0E7F5 0%,
-    #F5EFE0 22%,
-    #FAF7F0 50%,
-    #FDFCF8 100%
+    #B0DBF9 35%,
+    #93C5E8 70%,
+    #5BA0D4 100%
   );
   background-attachment: fixed;
   min-height: 100vh;
@@ -76,20 +178,20 @@ section {
     box-shadow: 0 8px 30px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.65);
   }
 
-  /* Tan Frost */
-  .glass-tan {
-    background: rgba(237,226,204,0.4);
-    border: 1px solid rgba(220,201,160,0.5);
-    box-shadow: 0 4px 20px rgba(160,128,80,0.06), inset 0 1px 0 rgba(255,255,255,0.4);
+  /* Sky Tint — replaces retired tan variant. Same translucent treatment, sky-blue cast. */
+  .glass-sky-tint {
+    background: rgba(91,160,212,0.08);
+    border: 1px solid rgba(91,160,212,0.20);
+    box-shadow: 0 4px 20px rgba(37,99,168,0.06), inset 0 1px 0 rgba(255,255,255,0.4);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border-radius: 16px;
     padding: 28px;
     transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
   }
-  .glass-tan:hover {
-    border-color: rgba(220,201,160,0.8);
-    box-shadow: 0 8px 30px rgba(160,128,80,0.10), inset 0 1px 0 rgba(255,255,255,0.55);
+  .glass-sky-tint:hover {
+    border-color: rgba(91,160,212,0.40);
+    box-shadow: 0 8px 30px rgba(37,99,168,0.12), inset 0 1px 0 rgba(255,255,255,0.55);
   }
 
   /* Green Tint */
@@ -188,6 +290,38 @@ section {
     border-color: rgba(91,160,212,0.32);
     box-shadow: 0 8px 30px rgba(37,99,168,0.18);
   }
+
+  /* Luminescent — refractive bright glass for the Manufacturing page.
+     Diagonal white gradient + heavy blur + slight brightness boost = a
+     surface that looks lit from above. Inset highlights on all four sides
+     give the impression of a beveled glass plate. */
+  .glass-luminescent {
+    background: linear-gradient(135deg,
+      rgba(255,255,255,0.18) 0%,
+      rgba(255,255,255,0.08) 50%,
+      rgba(255,255,255,0.14) 100%);
+    backdrop-filter: blur(32px) saturate(180%) brightness(1.05);
+    -webkit-backdrop-filter: blur(32px) saturate(180%) brightness(1.05);
+    border: 1px solid rgba(255,255,255,0.22);
+    box-shadow:
+      0 12px 40px rgba(15,42,74,0.12),
+      inset 0 1px 0 rgba(255,255,255,0.35),
+      inset 0 -1px 0 rgba(255,255,255,0.08),
+      inset 1px 0 0 rgba(255,255,255,0.12),
+      inset -1px 0 0 rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 28px;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
+  }
+  .glass-luminescent:hover {
+    border-color: rgba(255,255,255,0.32);
+    box-shadow:
+      0 16px 48px rgba(15,42,74,0.16),
+      inset 0 1px 0 rgba(255,255,255,0.45),
+      inset 0 -1px 0 rgba(255,255,255,0.10),
+      inset 1px 0 0 rgba(255,255,255,0.16),
+      inset -1px 0 0 rgba(255,255,255,0.16);
+  }
 }
 
 /* ========================================
@@ -230,29 +364,25 @@ section {
 
 .gradient-signature {
   background: linear-gradient(135deg,
-    #A08050 0%,
-    #C8AD7E 12%,
-    #1A6B4A 30%,
-    #40A865 45%,
-    #298475 55%,
-    #5BA0D4 65%,
-    #2563A8 80%,
-    #93C5E8 92%,
-    #DCC9A0 100%
+    #D0E7F5 0%,
+    #B0DBF9 18%,
+    #93C5E8 35%,
+    #5BA0D4 55%,
+    #4A8BC2 75%,
+    #2563A8 92%,
+    #1F4F8F 100%
   );
 }
 
 .gradient-signature-text {
   background: linear-gradient(135deg,
-    #A08050 0%,
-    #C8AD7E 12%,
-    #1A6B4A 30%,
-    #40A865 45%,
-    #298475 55%,
-    #5BA0D4 65%,
-    #2563A8 80%,
-    #93C5E8 92%,
-    #DCC9A0 100%
+    #D0E7F5 0%,
+    #B0DBF9 18%,
+    #93C5E8 35%,
+    #5BA0D4 55%,
+    #4A8BC2 75%,
+    #2563A8 92%,
+    #1F4F8F 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -286,8 +416,8 @@ section {
   font-size: 10px;
   font-weight: 300;
   letter-spacing: 5px;
-  color: #0F4D35;
-  opacity: 0.5;
+  color: #1F4F8F;
+  opacity: 0.6;
   text-transform: uppercase;
 }
 
@@ -307,10 +437,12 @@ section {
    - btn-glass-emerald:   frosted emerald (inline content CTAs, form submits)
    ======================================== */
 
+/* Primary CTA — kept class name btn-primary-emerald for compatibility with
+   inner pages, but visually retuned to sky-blue for the v13 palette. */
 .btn-primary-emerald {
-  background: #1A6B4A;
+  background: #2563A8;
   color: #FFFFFF;
-  border: 1px solid #1A6B4A;
+  border: 1px solid #2563A8;
   border-radius: 12px;
   padding: 14px 28px;
   font-size: 14px;
@@ -322,14 +454,14 @@ section {
   justify-content: center;
   gap: 0.5rem;
   text-decoration: none;
-  box-shadow: 0 6px 20px rgba(26,107,74,0.18);
+  box-shadow: 0 6px 20px rgba(37,99,168,0.22);
   cursor: pointer;
 }
 .btn-primary-emerald:hover {
-  background: #1F7D58;
-  border-color: #1F7D58;
+  background: #1F4F8F;
+  border-color: #1F4F8F;
   filter: brightness(1.05);
-  box-shadow: 0 10px 30px rgba(26,107,74,0.28);
+  box-shadow: 0 10px 30px rgba(37,99,168,0.32);
   transform: translateY(-1px);
 }
 
@@ -362,9 +494,9 @@ section {
 /* Hero CTAs — warm variants for the new sky/sand dissolve hero (dark text on
    the bright sky end-state, instead of the v3-gate's white-on-photo CTAs). */
 
-.btn-hero-solid-warm {
+.btn-hero-solid-sky {
   background: #FFFFFF;
-  color: #0F4D35;
+  color: #1F4F8F;
   border: 1px solid rgba(255,255,255,0.95);
   border-radius: 999px;
   padding: 14px 30px;
@@ -377,21 +509,21 @@ section {
   justify-content: center;
   gap: 0.5rem;
   text-decoration: none;
-  box-shadow: 0 10px 30px rgba(91,160,212,0.22);
+  box-shadow: 0 10px 30px rgba(37,99,168,0.25);
   cursor: pointer;
 }
-.btn-hero-solid-warm:hover {
+.btn-hero-solid-sky:hover {
   background: #FFFFFF;
   filter: brightness(1.05);
-  box-shadow: 0 16px 42px rgba(91,160,212,0.32), 0 0 0 1px rgba(220,201,160,0.6);
+  box-shadow: 0 16px 42px rgba(37,99,168,0.36), 0 0 0 1px rgba(147,197,232,0.7);
   transform: translateY(-2px);
-  color: #1A6B4A;
+  color: #2563A8;
 }
 
-.btn-hero-ghost-warm {
+.btn-hero-ghost-sky {
   background: rgba(255,255,255,0.42);
-  color: #0F4D35;
-  border: 1px solid rgba(15,77,53,0.22);
+  color: #1F4F8F;
+  border: 1px solid rgba(37,99,168,0.28);
   border-radius: 999px;
   padding: 14px 30px;
   font-size: 14px;
@@ -407,10 +539,64 @@ section {
   text-decoration: none;
   cursor: pointer;
 }
-.btn-hero-ghost-warm:hover {
+.btn-hero-ghost-sky:hover {
   background: rgba(255,255,255,0.6);
-  border-color: rgba(15,77,53,0.4);
+  border-color: rgba(37,99,168,0.5);
+  color: #2563A8;
   transform: translateY(-2px);
+}
+
+/* v13.3 hero CTAs — white pill primary (only navy text on the site outside
+   the nav), white-bordered glass ghost. */
+.btn-hero-navy {
+  background: #FFFFFF;
+  color: #0F2A4A;
+  border: 1.5px solid #FFFFFF;
+  border-radius: 999px;
+  padding: 14px 28px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgba(15,42,74,0.28);
+  cursor: pointer;
+}
+.btn-hero-navy:hover {
+  background: #FFFFFF;
+  filter: brightness(1.04);
+  box-shadow: 0 14px 38px rgba(15,42,74,0.36);
+  transform: translateY(-1px);
+}
+.btn-hero-navy-ghost {
+  background: rgba(255,255,255,0.10);
+  color: #FFFFFF;
+  border: 1.5px solid rgba(255,255,255,0.45);
+  border-radius: 999px;
+  padding: 14px 28px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-hero-navy-ghost:hover {
+  background: rgba(255,255,255,0.20);
+  border-color: rgba(255,255,255,0.65);
+  transform: translateY(-1px);
 }
 
 /* Gentle float for the static logo fallback (when hero video assets aren't dropped yet). */
@@ -472,10 +658,11 @@ section {
   transform: translateY(-2px);
 }
 
+/* btn-glass-emerald — class name kept for compatibility; visually retuned to sky-blue. */
 .btn-glass-emerald {
-  background: rgba(26,107,74,0.08);
-  border: 1px solid rgba(26,107,74,0.22);
-  color: #0F4D35;
+  background: rgba(91,160,212,0.08);
+  border: 1px solid rgba(91,160,212,0.22);
+  color: #1F4F8F;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
@@ -489,10 +676,10 @@ section {
   gap: 0.5rem;
 }
 .btn-glass-emerald:hover {
-  background: rgba(26,107,74,0.16);
-  border-color: rgba(26,107,74,0.35);
-  color: #1A6B4A;
-  box-shadow: 0 8px 30px rgba(26,107,74,0.18);
+  background: rgba(91,160,212,0.16);
+  border-color: rgba(91,160,212,0.35);
+  color: #2563A8;
+  box-shadow: 0 8px 30px rgba(37,99,168,0.18);
   transform: translateY(-1px);
 }
 
@@ -529,7 +716,7 @@ section {
   font-weight: 600;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: #1A6B4A;
+  color: #2563A8;
 }
 
 .display-heading {
@@ -567,6 +754,360 @@ section {
   font-size: 14px;
   line-height: 1.8;
   margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   GSAP REVEAL INIT — pre-reveal hidden state that GSAP onComplete strips
+   off so the element settles onto its CSS-defined final styles with no
+   visible inline-style snap.
+   ======================================== */
+
+.gsap-reveal-init {
+  opacity: 0;
+  will-change: transform, opacity, filter, letter-spacing;
+}
+.is-revealed {
+  opacity: 1;
+}
+
+/* Mobile (<768px) AIOperatingSystemSection headline column — the inline
+   `min-height: min(80vh, 720px)` is appropriate on desktop where the
+   headline + radial-diagram render side-by-side and need matching
+   heights. On mobile they stack and the 80vh min creates ~650px of
+   empty space below the headline before the cards begin. Drop the
+   min-height entirely on mobile. Desktop value remains via the inline
+   style at ≥768px. */
+@media (max-width: 768px) {
+  .aiops-headline-col {
+    min-height: 0 !important;
+  }
+}
+
+/* Mobile (<768px) FinalOasis logo: keep the gentle vertical float, drop
+   the infinite drop-shadow pulse. The pulse animates two stacked
+   filter:drop-shadow() values every 3s — GPU filter pass on every
+   animation frame, sustained while the section is in viewport. Replacing
+   the dual animation with just the cheap transform-only float removes the
+   continuous filter work on mobile. Desktop unchanged. */
+@media (max-width: 768px) {
+  .oasis-logo-float {
+    animation: oasis-logo-float 4s ease-in-out infinite !important;
+  }
+}
+
+/* Mobile (<768px) hero: the canvas/poster are no longer rendered. The
+   mobile hero is a static glowing OAISIS logo (.hero-glow-logo) over a
+   lush cloud field. Prior transform/scale + mask-removal rules for
+   .hero-canvas / .hero-poster on mobile were removed — those elements
+   don't exist on mobile anymore. Desktop (≥768px) canvas + poster
+   render and mask exactly as before. */
+
+/* Mobile hero glowing logo — STATIC sustained drop-shadow glow (no infinite
+   filter keyframe) for performance. Pairs with .oasis-logo-float which on
+   mobile is float-only (the @media rule above strips the pulse keyframe).
+   The result: a bright OAISIS palm logo, gently breathing vertically, with
+   a strong sustained halo — no per-frame GPU filter recompute. */
+.hero-glow-logo {
+  filter:
+    drop-shadow(0 0 28px rgba(255,255,255,0.55))
+    drop-shadow(0 0 56px rgba(255,255,255,0.30))
+    drop-shadow(0 0 96px rgba(147,197,232,0.20));
+}
+
+/* Mobile hero layer warmth — keep the hero's composited layers resident in
+   GPU memory so scrolling the hero out of and back into view doesn't trigger
+   re-rasterization of the conic-gradient sun beams, the blurred cloud field,
+   the drop-shadowed logo, and the eyebrow's text-shadow glow. Without these
+   hints, off-screen layers can be evicted; on re-entry the browser must
+   re-decode + re-rasterize them, which the user sees as a "pop-in flash."
+   `transform: translateZ(0)` is the minimal-impact GPU-layer promotion;
+   `backface-visibility: hidden` prevents flicker on certain mobile browsers
+   (older WebKit). Desktop (≥768px) untouched — the desktop hero's canvas
+   pipeline already maintains its own paint cadence via the scrub. */
+@media (max-width: 768px) {
+  .hero-section-root {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  .hero-section-root .hero-eyebrow,
+  .hero-section-root .hero-glow-logo,
+  .hero-section-root .hero-sun-beams {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: transform, filter;
+  }
+}
+
+/* Mobile hero eyebrow — white luminous text with a sustained glow halo
+   that gently pulses (the hero-eyebrow-radiate animation below). Desktop
+   (≥768px) renders the inline-styled navy <p> unchanged. */
+/* Radiating glow pulse — breathes the whole halo stack between two
+   intensity states over 3.5s. The contrast shadow (0 2px 4px navy) is
+   identical in both keyframes so legibility never wavers; only the outer
+   halo layers expand and lift in opacity, then return. */
+@keyframes hero-eyebrow-radiate {
+  0%, 100% {
+    text-shadow:
+      0 0 8px rgba(255, 255, 255, 0.45),
+      0 0 20px rgba(255, 255, 255, 0.30),
+      0 0 40px rgba(255, 255, 255, 0.18),
+      0 0 80px rgba(255, 255, 255, 0.10),
+      0 0 120px rgba(180, 220, 255, 0.08),
+      0 2px 4px rgba(15, 42, 74, 0.45);
+  }
+  50% {
+    text-shadow:
+      0 0 12px rgba(255, 255, 255, 0.55),
+      0 0 30px rgba(255, 255, 255, 0.40),
+      0 0 60px rgba(255, 255, 255, 0.25),
+      0 0 110px rgba(255, 255, 255, 0.15),
+      0 0 160px rgba(180, 220, 255, 0.12),
+      0 2px 4px rgba(15, 42, 74, 0.45);
+  }
+}
+@media (max-width: 768px) {
+  .hero-eyebrow {
+    color: #FFFFFF !important;
+    text-shadow:
+      0 0 8px rgba(255, 255, 255, 0.45),
+      0 0 20px rgba(255, 255, 255, 0.30),
+      0 0 40px rgba(255, 255, 255, 0.18),
+      0 0 80px rgba(255, 255, 255, 0.10),
+      0 0 120px rgba(180, 220, 255, 0.08),
+      0 2px 4px rgba(15, 42, 74, 0.45) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.18em !important;
+    position: relative !important;
+    z-index: 1 !important;
+    animation: hero-eyebrow-radiate 3.5s ease-in-out infinite !important;
+  }
+}
+
+/* Mobile hero sunburst beam field — pure-CSS conic-gradient with 12
+   alternating beam stripes radiating from center. Radial mask fades the
+   beams toward the edges so the silhouette is circular, not square. 60s
+   rotation adds cosmic motion that's perceptible only over many seconds.
+   Single conic-gradient + mask + transform = one composited layer, GPU
+   cheap. The class is only ever attached to a mobile-only JSX element
+   (the @media gate is belt-and-suspenders). */
+@keyframes hero-beams-rotate {
+  from { transform: translate(50%, -50%) rotate(0deg); }
+  to   { transform: translate(50%, -50%) rotate(360deg); }
+}
+@media (max-width: 768px) {
+  .hero-sun-beams {
+    position: absolute;
+    inset: 50% 50% auto auto;
+    transform: translate(50%, -50%);
+    width: 700px;
+    height: 700px;
+    pointer-events: none;
+    z-index: 0;
+    background: conic-gradient(
+      from 0deg,
+      rgba(255, 255, 255, 0) 0deg,
+      rgba(255, 255, 255, 0.22) 8deg,
+      rgba(255, 255, 255, 0) 16deg,
+      rgba(255, 255, 255, 0) 30deg,
+      rgba(255, 255, 255, 0.18) 38deg,
+      rgba(255, 255, 255, 0) 46deg,
+      rgba(255, 255, 255, 0) 60deg,
+      rgba(255, 255, 255, 0.22) 68deg,
+      rgba(255, 255, 255, 0) 76deg,
+      rgba(255, 255, 255, 0) 90deg,
+      rgba(255, 255, 255, 0.18) 98deg,
+      rgba(255, 255, 255, 0) 106deg,
+      rgba(255, 255, 255, 0) 120deg,
+      rgba(255, 255, 255, 0.22) 128deg,
+      rgba(255, 255, 255, 0) 136deg,
+      rgba(255, 255, 255, 0) 150deg,
+      rgba(255, 255, 255, 0.18) 158deg,
+      rgba(255, 255, 255, 0) 166deg,
+      rgba(255, 255, 255, 0) 180deg,
+      rgba(255, 255, 255, 0.22) 188deg,
+      rgba(255, 255, 255, 0) 196deg,
+      rgba(255, 255, 255, 0) 210deg,
+      rgba(255, 255, 255, 0.18) 218deg,
+      rgba(255, 255, 255, 0) 226deg,
+      rgba(255, 255, 255, 0) 240deg,
+      rgba(255, 255, 255, 0.22) 248deg,
+      rgba(255, 255, 255, 0) 256deg,
+      rgba(255, 255, 255, 0) 270deg,
+      rgba(255, 255, 255, 0.18) 278deg,
+      rgba(255, 255, 255, 0) 286deg,
+      rgba(255, 255, 255, 0) 300deg,
+      rgba(255, 255, 255, 0.22) 308deg,
+      rgba(255, 255, 255, 0) 316deg,
+      rgba(255, 255, 255, 0) 330deg,
+      rgba(255, 255, 255, 0.18) 338deg,
+      rgba(255, 255, 255, 0) 346deg,
+      rgba(255, 255, 255, 0) 360deg
+    );
+    -webkit-mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 18%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0) 70%);
+    mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 18%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0) 70%);
+    opacity: 0.85;
+    animation: hero-beams-rotate 60s linear infinite;
+    will-change: transform;
+  }
+}
+
+/* Mobile (<768px) scroll-velocity blur disable — second layer of
+   protection alongside the matchMedia gate in useCinematicGlobals.
+   Even if the --scroll-blur variable ever gets a non-zero value, the
+   `filter: none !important` here removes <main> from the GPU filter
+   compositing path entirely. `transition: none` kills the 200ms
+   filter-blur tween that would otherwise schedule paint work on every
+   class/property change. Desktop (≥768px) untouched. */
+@media (max-width: 768px) {
+  .scroll-blur-target {
+    filter: none !important;
+    transition: none !important;
+  }
+}
+
+/* Mobile (<768px) SupplyChainFlow stack — the 3-column grid (raw
+   materials / production / warehouse) collapses to a single column so
+   each beat is full-width and readable. The inline desktop grid-template
+   (1fr 1.35fr 1fr) is overridden with !important because the inline style
+   would otherwise win. Desktop layout unchanged at ≥768px. */
+@media (max-width: 768px) {
+  .supplychain-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Mobile (<768px) Capabilities chapter behavior — inactive chapters are
+   FULLY removed from layout (not just opacity 0 + absolute), so they can't
+   overlap the active chapter on a narrow viewport. The active chapter
+   reflows into normal document flow (position: static) so the parent has
+   real height. Desktop (≥768px) keeps the original absolute-stack +
+   opacity-cross-fade behavior. */
+@media (max-width: 768px) {
+  .capabilities-chapter {
+    position: static !important;
+    inset: auto !important;
+  }
+  .capabilities-chapter[data-active="false"] {
+    display: none !important;
+  }
+  /* Bottom step-counter strip — hide inactive labels on mobile so only the
+     active chapter's "01 · SELL" pair shows. Without this, all four labels
+     render side-by-side in a flex row that overflows the 375px viewport
+     and reads as overlapping/scrambled text. */
+  .capabilities-step-label[data-step-active="false"] {
+    display: none !important;
+  }
+  /* Capabilities mobile layout fix. Diagnosis: the desktop grid is
+     `grid-rows-1` (= one explicit 1fr row + an implicit auto row), with
+     `items-center`. On mobile that puts the text in the stretched 1fr row
+     and the mockup in the auto row at the bottom of the wrapper. The
+     absolute StepCounter at `bottom: 80` then overlaps the mockup. The
+     prior `.capabilities-chapter[data-active="true"] { padding-bottom: 80px }`
+     rule was applied to the TEXT chapter (row 1), so it widened the
+     text→mockup gap instead of the mockup→step-counter gap.
+     Fix has three parts (all mobile-scoped):
+       1. Switch the grid to `auto auto` rows + `align-content: start`, so
+          rows are content-sized and stack from the top. The mockup row no
+          longer slides to the wrapper bottom.
+       2. Tighten the text→mockup gap with a clamp() between 16 and 32px.
+       3. Add wrapper padding-bottom + raise the StepCounter from bottom:80
+          to a smaller clamp(), so the mockup bottom and the step labels
+          have clamp(48, 8vh, 96) of clear gap and the section transitions
+          cleanly into the BreathMoment below (no white card edge near the
+          section boundary).
+     Desktop (≥768px) is unchanged — none of these rules apply there. */
+  #capabilities .grid-cols-1 {
+    grid-template-rows: auto auto !important;
+    gap: clamp(16px, 3vh, 32px) !important;
+    align-content: start !important;
+  }
+  .capabilities-section-inner {
+    padding-bottom: clamp(128px, 18vh, 200px);
+    min-height: auto !important;
+  }
+  .capabilities-step-counter {
+    bottom: clamp(40px, 6vh, 64px) !important;
+  }
+}
+
+/* Mobile (<768px) NumbersTicking — the 3-tile metric strip overflows on a
+   ~91px-wide tile with the desktop 22px value font + 14px icon. Shrink the
+   value text, icon, and tile padding so the metrics fit without horizontal
+   clipping. The card itself, the header strip, and the insights block stay
+   at their desktop sizing. Desktop (≥768px) unchanged. */
+@media (max-width: 768px) {
+  .numbers-ticking-content {
+    padding: 16px !important;
+    min-height: 280px !important;
+  }
+  .numbers-ticking-metric {
+    padding: 8px !important;
+  }
+  .numbers-ticking-icon {
+    width: 11px !important;
+    height: 11px !important;
+  }
+  .numbers-ticking-value {
+    font-size: 15px !important;
+  }
+  .numbers-ticking-row {
+    gap: 4px !important;
+    margin-top: 6px !important;
+  }
+}
+
+/* Mobile (<768px) backdrop-filter reduction. Glass surfaces sitewide drop
+   from blur(24-32px) saturate(180%) to blur(8px) saturate(120%) so mobile
+   GPUs aren't sustaining a heavy backdrop-filter on 15+ stacked cards.
+   !important is intentional — these classes set blur inline via @layer
+   components, and the selector list covers every glass variant the codebase
+   ships (.glass, .glass-sky-tint, .glass-green, .glass-blue, .glass-glow,
+   .glass-night*, .glass-luminescent) plus the nav pill and any future
+   [class*="glass"] additions. Desktop unchanged at ≥768px. */
+@media (max-width: 768px) {
+  .glass,
+  .glass-sky-tint,
+  .glass-green,
+  .glass-blue,
+  .glass-glow,
+  .glass-night,
+  .glass-night-green,
+  .glass-night-blue,
+  .glass-luminescent,
+  .nav-liquid-glass,
+  [class*="glass"] {
+    backdrop-filter: blur(8px) saturate(120%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
+  }
+}
+
+/* Cropped wordmark — font-size driven by CSS variables so we can media-
+   scope a mobile override without an inline `font-size:` competing. At
+   ≥768px desktop renders the original clamp value; <768px swaps to the
+   mobile clamp (smaller floor) so the wordmark doesn't overflow at 375–390px. */
+.cropped-wordmark-glyph {
+  font-size: var(--wordmark-font-size);
+}
+@media (max-width: 768px) {
+  .cropped-wordmark-glyph {
+    font-size: var(--wordmark-font-size-mobile);
+  }
+}
+
+/* ========================================
+   RADIAL DIAGRAM — luminescent icon hover treatment
+   ======================================== */
+
+.radial-icon-tile {
+  pointer-events: auto;
+  cursor: pointer;
+}
+.radial-icon-tile:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 36px rgba(255,255,255,0.55),
+    inset 0 0 24px rgba(255,255,255,0.32),
+    0 10px 28px rgba(15,42,74,0.32);
 }
 
 /* ========================================
@@ -622,8 +1163,8 @@ section {
   50%      { transform: translateY(-8px); }
 }
 @keyframes oasis-logo-pulse {
-  0%, 100% { filter: drop-shadow(0 0 32px rgba(220,201,160,0.4)) drop-shadow(0 0 64px rgba(255,253,245,0.15)); }
-  50%      { filter: drop-shadow(0 0 44px rgba(220,201,160,0.55)) drop-shadow(0 0 80px rgba(255,253,245,0.22)); }
+  0%, 100% { filter: drop-shadow(0 0 32px rgba(255,255,255,0.4)) drop-shadow(0 0 64px rgba(255,255,255,0.15)); }
+  50%      { filter: drop-shadow(0 0 44px rgba(255,255,255,0.55)) drop-shadow(0 0 80px rgba(255,255,255,0.22)); }
 }
 .oasis-logo-float {
   animation: oasis-logo-float 4s ease-in-out infinite, oasis-logo-pulse 3s ease-in-out infinite;
@@ -648,7 +1189,7 @@ section {
 
 .btn-oasis-hero {
   background: rgba(255,255,255,0.92);
-  color: #0F4D35;
+  color: #1F4F8F;
   border: 1px solid rgba(255,255,255,0.95);
   border-radius: 999px;
   padding: 18px 40px;
@@ -663,12 +1204,13 @@ section {
   justify-content: center;
   gap: 0.5rem;
   text-decoration: none;
-  box-shadow: 0 10px 36px rgba(15,77,53,0.25);
+  box-shadow: 0 12px 40px rgba(15,77,53,0.30);
   cursor: pointer;
 }
 .btn-oasis-hero:hover {
   background: #FFFFFF;
-  box-shadow: 0 16px 48px rgba(220,201,160,0.35), 0 0 0 1px rgba(220,201,160,0.6);
+  color: #2563A8;
+  box-shadow: 0 18px 52px rgba(255,255,255,0.45), 0 0 0 1px rgba(255,255,255,0.85);
   transform: translateY(-2px);
 }
 
@@ -686,7 +1228,7 @@ section {
 
 /* Trim glass card padding slightly on small screens */
 @media (max-width: 640px) {
-  .glass, .glass-tan, .glass-green, .glass-blue, .glass-glow,
+  .glass, .glass-sky-tint, .glass-green, .glass-blue, .glass-glow,
   .glass-night, .glass-night-green, .glass-night-blue {
     padding: 22px;
   }

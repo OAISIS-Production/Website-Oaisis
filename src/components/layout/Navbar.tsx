@@ -3,19 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   Menu,
   X,
-  Sunrise,
   MessageCircle,
-  Search,
-  Mail,
-  Bell,
   Settings,
   FileText,
-  Wrench,
   Building2,
-  UtensilsCrossed,
   Globe2,
+  Factory,
   ChevronDown,
-  Hammer,
 } from 'lucide-react';
 import GlowLogo from '../ui/GlowLogo';
 
@@ -36,54 +30,35 @@ interface DropdownGroup {
   links: MenuLink[];
 }
 
+// Features = products + about. Solutions = industries.
 const FEATURES_GROUPS: DropdownGroup[] = [
   {
-    heading: 'Pro OS Capabilities',
     links: [
-      { label: 'Morning Briefs', description: 'A read, not a dashboard.', href: '/pro-os#briefs', icon: Sunrise },
-      { label: 'Ask Anything', description: 'Real answers, not chat.', href: '/pro-os#ask', icon: MessageCircle },
-      { label: 'Lead Sourcing', description: 'Pipeline while you sleep.', href: '/pro-os#sourcing', icon: Search },
-      { label: 'Outreach', description: 'Personalized, in your voice.', href: '/pro-os#outreach', icon: Mail },
-      { label: 'Monitoring', description: 'Interrupts only when it matters.', href: '/pro-os#monitoring', icon: Bell },
-      { label: 'Custom Workflows', description: 'In conversation, not code.', href: '/pro-os#workflows', icon: Settings },
-    ],
-  },
-  {
-    heading: 'Other Products',
-    links: [
+      { label: 'Oaisis OS', description: 'The operating layer.', href: '/pro-os', icon: Settings },
       {
         label: 'Invoice Intelligence',
-        description: 'For multi-unit restaurants.',
-        href: 'https://invoiceoasis.com',
+        description: 'AP automation for multi-unit operators.',
+        href: 'https://oaisis-dev.github.io/invoice-intelligence-landing-page/#pricing',
         external: true,
         icon: FileText,
       },
-      { label: 'Custom Builds', description: 'Built for your industry.', href: '/pro-os/general', icon: Hammer },
+      { label: 'About', description: 'Why we built this.', href: '/about', icon: MessageCircle },
     ],
   },
 ];
 
 const SOLUTIONS_GROUPS: DropdownGroup[] = [
   {
-    heading: 'By industry',
     links: [
-      { label: 'Home Services', description: 'HVAC, plumbing, field service.', href: '/pro-os/home-services', icon: Wrench },
-      { label: 'Private Equity', description: '$100K savings in 60 days.', href: '/pro-os/private-equity', icon: Building2 },
-      {
-        label: 'Restaurants',
-        description: 'Invoice Intelligence — live.',
-        href: 'https://invoiceoasis.com',
-        external: true,
-        icon: UtensilsCrossed,
-      },
-      { label: 'Other / Custom', description: 'Anyone running on data.', href: '/pro-os/general', icon: Globe2 },
+      { label: 'Private Equity', description: 'Portfolio-wide AI deployment.', href: '/pro-os/private-equity', icon: Building2 },
+      { label: 'Manufacturing', description: 'Inbound. Production. Outbound.', href: '/pro-os/manufacturing', icon: Factory },
+      { label: 'Every other industry', description: 'Tell us what you do.', href: '/pro-os/general', icon: Globe2 },
     ],
   },
 ];
 
 const SIMPLE_LINKS: { label: string; href: string }[] = [
   { label: 'Pricing', href: '/pricing' },
-  { label: 'Resources', href: '/resources' },
   { label: 'About', href: '/about' },
 ];
 
@@ -92,34 +67,24 @@ interface NavStyle {
   border: string;
   linkColor: string;
   linkHoverColor: string;
-  logoGlow: 'white' | 'green';
+  logoGlow: 'white' | 'deep';
   wordmarkColor: string;
   wordmarkOpacity: number;
   loginColor: string;
 }
 
-function getNavStyle(transparent: boolean): NavStyle {
-  if (transparent) {
-    return {
-      bg: 'transparent',
-      border: '1px solid transparent',
-      linkColor: 'rgba(255,255,255,0.85)',
-      linkHoverColor: '#FFFFFF',
-      logoGlow: 'white',
-      wordmarkColor: '#FFFFFF',
-      wordmarkOpacity: 0.7,
-      loginColor: 'rgba(255,255,255,0.75)',
-    };
-  }
+// v13.3: floating glass pill nav. Sky-blue tint over backdrop blur, all text
+// white. The "Book a demo" pill is the only navy-text element on the site.
+function getNavStyle(_transparent: boolean): NavStyle {
   return {
-    bg: 'rgba(245,239,224,0.7)',
-    border: '1px solid rgba(220,201,160,0.3)',
-    linkColor: '#4D4060',
-    linkHoverColor: '#2563A8',
-    logoGlow: 'green',
-    wordmarkColor: '#0F4D35',
-    wordmarkOpacity: 0.5,
-    loginColor: '#8A7DA0',
+    bg: 'rgba(91,160,212,0.35)',
+    border: '1px solid rgba(255,255,255,0.25)',
+    linkColor: '#FFFFFF',
+    linkHoverColor: '#FFFFFF',
+    logoGlow: 'white',
+    wordmarkColor: '#FFFFFF',
+    wordmarkOpacity: 1,
+    loginColor: 'rgba(255,255,255,0.85)',
   };
 }
 
@@ -132,7 +97,7 @@ interface MegaDropdownProps {
   textShadow?: boolean;
 }
 
-function MegaDropdown({ groups, width = 720, isOpen, onMouseEnter, onMouseLeave }: MegaDropdownProps) {
+function MegaDropdown({ groups, width = 260, isOpen, onMouseEnter, onMouseLeave }: MegaDropdownProps) {
   if (!isOpen) return null;
   return (
     <div
@@ -140,90 +105,78 @@ function MegaDropdown({ groups, width = 720, isOpen, onMouseEnter, onMouseLeave 
       onMouseLeave={onMouseLeave}
       style={{
         position: 'absolute',
-        top: 'calc(100% + 6px)',
+        // Sit flush against nav, then offset visually via padding so the
+        // cursor never leaves the hit area when crossing the gap.
+        top: '100%',
         left: '50%',
         transform: 'translateX(-50%)',
-        width: 'min(calc(100vw - 32px), ' + width + 'px)',
-        padding: 18,
-        borderRadius: 18,
-        background: 'rgba(255,255,255,0.88)',
-        backdropFilter: 'blur(32px)',
-        WebkitBackdropFilter: 'blur(32px)',
-        border: '1px solid rgba(255,255,255,0.85)',
-        boxShadow: '0 20px 60px rgba(15,77,53,0.16)',
+        minWidth: width,
+        maxWidth: 'min(calc(100vw - 32px), 480px)',
+        paddingTop: 8,
         zIndex: 200,
       }}
     >
-      <div
-        className="grid gap-4"
-        style={{
-          gridTemplateColumns: groups.length > 1 ? '1fr 1fr' : '1fr',
-        }}
-      >
+    <div
+      style={{
+        padding: 12,
+        borderRadius: 16,
+        // Refractive glass — no blue tint, picks up environment color.
+        background: 'rgba(255,255,255,0.08)',
+        backdropFilter: 'blur(48px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(48px) saturate(180%)',
+        border: '1px solid rgba(255,255,255,0.25)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.45), 0 12px 40px rgba(15,42,74,0.20)',
+      }}
+    >
+      <div className="flex flex-col" style={{ gap: 2 }}>
         {groups.map((group, gi) => (
-          <div key={gi}>
-            {group.heading && (
-              <p
-                style={{
-                  fontSize: 9,
-                  fontWeight: 600,
-                  letterSpacing: '2.5px',
-                  textTransform: 'uppercase',
-                  color: '#1A6B4A',
-                  marginBottom: 10,
-                  padding: '0 10px',
-                }}
-              >
-                {group.heading}
-              </p>
-            )}
-            <div className="flex flex-col">
-              {group.links.map((link) => {
-                const Icon = link.icon;
-                const inner = (
+          <div key={gi} className="flex flex-col">
+            {group.links.map((link) => {
+              const Icon = link.icon;
+              const inner = (
+                <div
+                  className="flex items-start gap-3 transition-colors"
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    background: 'transparent',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.10)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLDivElement).style.background = 'transparent';
+                  }}
+                >
                   <div
-                    className="flex items-start gap-3 transition-colors"
                     style={{
-                      padding: '10px 10px',
-                      borderRadius: 12,
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLDivElement).style.background = 'rgba(208,231,245,0.45)';
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLDivElement).style.background = 'transparent';
+                      width: 30,
+                      height: 30,
+                      borderRadius: 8,
+                      background: 'rgba(255,255,255,0.18)',
+                      border: '1px solid rgba(255,255,255,0.28)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#FFFFFF',
+                      flexShrink: 0,
                     }}
                   >
-                    <div
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 9,
-                        background: 'rgba(212,240,220,0.6)',
-                        border: '1px solid rgba(26,107,74,0.18)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: '#1A6B4A',
-                        flexShrink: 0,
-                      }}
-                    >
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p style={{ fontSize: 13, fontWeight: 600, color: '#2A1F38', lineHeight: 1.3 }}>
-                        {link.label}
-                      </p>
-                      {link.description && (
-                        <p style={{ fontSize: 12, color: '#4D4060', lineHeight: 1.4, marginTop: 2 }}>
-                          {link.description}
-                        </p>
-                      )}
-                    </div>
+                    <Icon className="w-4 h-4" />
                   </div>
-                );
-
-                return link.external ? (
+                  <div className="flex-1 min-w-0">
+                    <p style={{ fontSize: 13, fontWeight: 500, color: '#FFFFFF', lineHeight: 1.3, fontFamily: "'Inter', sans-serif" }}>
+                      {link.label}
+                    </p>
+                    {link.description && (
+                      <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.7)', lineHeight: 1.4, marginTop: 2, fontFamily: "'Inter', sans-serif" }}>
+                        {link.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+              return link.external ? (
                   <a
                     key={link.label}
                     href={link.href}
@@ -240,9 +193,9 @@ function MegaDropdown({ groups, width = 720, isOpen, onMouseEnter, onMouseLeave 
                 );
               })}
             </div>
-          </div>
         ))}
       </div>
+    </div>
     </div>
   );
 }
@@ -280,12 +233,12 @@ export default function Navbar({ scrolled = false }: NavbarProps) {
   };
 
   const navLinkBaseStyle: React.CSSProperties = {
-    fontSize: 13,
-    fontWeight: 500,
-    letterSpacing: '0.2px',
+    fontSize: 14,
+    fontWeight: 600,
+    letterSpacing: '0.1px',
     color: style.linkColor,
-    padding: '8px 14px',
-    borderRadius: 8,
+    padding: '6px 14px',
+    borderRadius: 999,
     background: 'transparent',
     border: 'none',
     cursor: 'pointer',
@@ -294,34 +247,51 @@ export default function Navbar({ scrolled = false }: NavbarProps) {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 4,
-    textShadow: transparent ? '0 1px 6px rgba(37,99,168,0.18)' : 'none',
+    fontFamily: "'Inter', sans-serif",
   };
 
   return (
-    <div className="sticky top-0 z-[100] w-full">
+    <>
+    <div
+      className="fixed left-1/2 z-[100]"
+      style={{
+        top: 16,
+        transform: 'translateX(-50%)',
+        width: 'min(820px, calc(100vw - 32px))',
+      }}
+    >
       <nav
-        className="transition-all duration-300"
+        className="nav-liquid-glass"
         style={{
-          background: style.bg,
-          backdropFilter: transparent ? 'none' : 'blur(24px)',
-          WebkitBackdropFilter: transparent ? 'none' : 'blur(24px)',
-          borderBottom: transparent ? '1px solid transparent' : '1px solid rgba(220,201,160,0.3)',
+          // Thin sheet of clear glass — lower tint (0.04), reduced blur (24px)
+          // so page color refracts through visibly instead of being frosted
+          // out. Padding pulled back to 12px vertical for a slim profile.
+          background: 'rgba(255,255,255,0.04)',
+          backdropFilter: 'blur(24px) saturate(160%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+          border: '1px solid rgba(255,255,255,0.16)',
+          borderRadius: 999,
           padding: '12px 24px',
+          boxShadow: [
+            '0 6px 24px rgba(0,0,0,0.06)',
+            'inset 0 1px 0 rgba(255,255,255,0.22)',
+            'inset 0 -1px 0 rgba(255,255,255,0.06)',
+          ].join(', '),
         }}
       >
-        <div className="max-w-7xl mx-auto relative">
-          <div className="flex justify-between items-center gap-4">
+        <div className="relative">
+          <div className="flex justify-between items-center gap-3" style={{ height: 36 }}>
             <Link to="/" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
-              <GlowLogo size={28} glow={style.logoGlow} />
+              <GlowLogo size={26} glow={style.logoGlow} />
               <span
                 style={{
-                  fontSize: 10,
-                  fontWeight: 300,
-                  letterSpacing: 5,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  letterSpacing: 3.5,
                   color: style.wordmarkColor,
                   opacity: style.wordmarkOpacity,
                   textTransform: 'uppercase',
-                  textShadow: transparent ? '0 1px 6px rgba(37,99,168,0.25)' : 'none',
+                  fontFamily: "'Inter', sans-serif",
                 }}
               >
                 OAISIS
@@ -329,37 +299,53 @@ export default function Navbar({ scrolled = false }: NavbarProps) {
             </Link>
 
             <div className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
-              <button
-                type="button"
-                onMouseEnter={() => scheduleOpen('features')}
-                onMouseLeave={scheduleClose}
-                onClick={() => setOpenDropdown(openDropdown === 'features' ? null : 'features')}
-                style={navLinkBaseStyle}
-                aria-expanded={openDropdown === 'features'}
-                aria-haspopup="true"
-              >
-                Features
-                <ChevronDown
-                  className="w-3 h-3"
-                  style={{ transform: openDropdown === 'features' ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
+              <div style={{ position: 'relative' }} onMouseLeave={scheduleClose}>
+                <button
+                  type="button"
+                  onMouseEnter={() => scheduleOpen('features')}
+                  onClick={() => setOpenDropdown(openDropdown === 'features' ? null : 'features')}
+                  style={navLinkBaseStyle}
+                  aria-expanded={openDropdown === 'features'}
+                  aria-haspopup="true"
+                >
+                  Features
+                  <ChevronDown
+                    className="w-3 h-3"
+                    style={{ transform: openDropdown === 'features' ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
+                  />
+                </button>
+                <MegaDropdown
+                  groups={FEATURES_GROUPS}
+                  width={320}
+                  isOpen={openDropdown === 'features'}
+                  onMouseEnter={cancelClose}
+                  onMouseLeave={scheduleClose}
                 />
-              </button>
+              </div>
 
-              <button
-                type="button"
-                onMouseEnter={() => scheduleOpen('solutions')}
-                onMouseLeave={scheduleClose}
-                onClick={() => setOpenDropdown(openDropdown === 'solutions' ? null : 'solutions')}
-                style={navLinkBaseStyle}
-                aria-expanded={openDropdown === 'solutions'}
-                aria-haspopup="true"
-              >
-                Solutions
-                <ChevronDown
-                  className="w-3 h-3"
-                  style={{ transform: openDropdown === 'solutions' ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
+              <div style={{ position: 'relative' }} onMouseLeave={scheduleClose}>
+                <button
+                  type="button"
+                  onMouseEnter={() => scheduleOpen('solutions')}
+                  onClick={() => setOpenDropdown(openDropdown === 'solutions' ? null : 'solutions')}
+                  style={navLinkBaseStyle}
+                  aria-expanded={openDropdown === 'solutions'}
+                  aria-haspopup="true"
+                >
+                  Solutions
+                  <ChevronDown
+                    className="w-3 h-3"
+                    style={{ transform: openDropdown === 'solutions' ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
+                  />
+                </button>
+                <MegaDropdown
+                  groups={SOLUTIONS_GROUPS}
+                  width={340}
+                  isOpen={openDropdown === 'solutions'}
+                  onMouseEnter={cancelClose}
+                  onMouseLeave={scheduleClose}
                 />
-              </button>
+              </div>
 
               {SIMPLE_LINKS.map((link) => (
                 <Link key={link.label} to={link.href} style={navLinkBaseStyle}>
@@ -368,54 +354,24 @@ export default function Navbar({ scrolled = false }: NavbarProps) {
               ))}
             </div>
 
-            <div className="hidden md:flex items-center gap-2">
-              <Link
-                to="/login"
-                style={{
-                  fontSize: 13,
-                  fontWeight: 500,
-                  letterSpacing: '0.2px',
-                  color: style.loginColor,
-                  textDecoration: 'none',
-                  padding: '8px 14px',
-                  textShadow: transparent ? '0 1px 6px rgba(37,99,168,0.18)' : 'none',
-                }}
-              >
-                Login
-              </Link>
+            <div className="hidden md:flex items-center">
               <Link
                 to="/demo"
+                className="btn-magnetic"
                 style={{
                   fontSize: 13,
-                  fontWeight: 500,
-                  letterSpacing: '0.2px',
-                  color: transparent ? '#FFFFFF' : '#2563A8',
-                  background: transparent ? 'rgba(255,255,255,0.10)' : 'rgba(208,231,245,0.45)',
-                  border: transparent ? '1px solid rgba(255,255,255,0.4)' : '1px solid rgba(91,160,212,0.3)',
-                  padding: '8px 16px',
-                  borderRadius: 999,
-                  textDecoration: 'none',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                Start free
-              </Link>
-              <Link
-                to="/demo"
-                style={{
-                  fontSize: 13,
-                  fontWeight: 500,
-                  letterSpacing: '0.2px',
-                  color: transparent ? '#2A1F38' : '#FFFFFF',
-                  background: transparent ? '#FFFFFF' : '#1A6B4A',
-                  border: transparent ? '1px solid #FFFFFF' : '1px solid #1A6B4A',
+                  fontWeight: 600,
+                  letterSpacing: '0.1px',
+                  color: '#0F2A4A',
+                  background: '#FFFFFF',
+                  border: '1px solid rgba(255,255,255,0.95)',
                   padding: '8px 18px',
                   borderRadius: 999,
                   textDecoration: 'none',
                   transition: 'all 0.2s ease',
-                  boxShadow: transparent ? '0 6px 18px rgba(255,255,255,0.18)' : '0 4px 14px rgba(26,107,74,0.20)',
+                  boxShadow: '0 4px 14px rgba(15,42,74,0.18)',
+                  fontFamily: "'Inter', sans-serif",
+                  lineHeight: 1,
                 }}
               >
                 Book a demo
@@ -433,36 +389,34 @@ export default function Navbar({ scrolled = false }: NavbarProps) {
             </button>
           </div>
 
-          <div
-            onMouseEnter={cancelClose}
-            onMouseLeave={scheduleClose}
-            className="hidden md:block"
-          >
-            <MegaDropdown
-              groups={FEATURES_GROUPS}
-              width={680}
-              isOpen={openDropdown === 'features'}
-              onMouseEnter={cancelClose}
-              onMouseLeave={scheduleClose}
-            />
-            <MegaDropdown
-              groups={SOLUTIONS_GROUPS}
-              width={360}
-              isOpen={openDropdown === 'solutions'}
-              onMouseEnter={cancelClose}
-              onMouseLeave={scheduleClose}
-            />
-          </div>
         </div>
       </nav>
+    </div>
 
+      {/* Mobile drawer — rendered OUTSIDE the transformed parent so its
+          `position: fixed` resolves to the viewport (not the 343-px-wide
+          centered nav wrapper). The wrapper above uses transform:
+          translateX(-50%) which creates a containing block for fixed-
+          position descendants — that bug kept the drawer constrained
+          to the pill's footprint and made the hamburger appear non-
+          functional. z-[110] so the drawer sits above the nav pill
+          (z-[100]) when open. md:hidden gates the entire drawer off the
+          DOM at ≥768px, so desktop is unchanged. */}
       {mobileOpen && (
         <div
-          className="md:hidden fixed inset-0 top-[60px] z-40 overflow-y-auto"
+          className="md:hidden fixed inset-0 top-[88px] z-[90] overflow-y-auto"
           style={{
-            background: 'rgba(245,239,224,0.95)',
+            background: 'rgba(240,247,253,0.95)',
             backdropFilter: 'blur(28px)',
             WebkitBackdropFilter: 'blur(28px)',
+            maxHeight: 'calc(100vh - 88px)',
+            WebkitOverflowScrolling: 'touch',
+            // Sits BELOW the nav. top-[88px] = nav-top (16px) + nav-height
+            // (60px) + 12px gap = 88px. z-[90] is below the nav wrapper's
+            // z-[100] so the nav pill stays visible above the drawer.
+            // All four corners rounded — reads as a floating panel below
+            // the nav rather than attached to it flush.
+            borderRadius: 24,
           }}
         >
           <div className="px-6 py-8 flex flex-col gap-5">
@@ -477,7 +431,7 @@ export default function Navbar({ scrolled = false }: NavbarProps) {
                           fontWeight: 600,
                           letterSpacing: '3px',
                           textTransform: 'uppercase',
-                          color: '#1A6B4A',
+                          color: '#2563A8',
                           marginBottom: 10,
                           padding: '0 8px',
                         }}
@@ -530,7 +484,7 @@ export default function Navbar({ scrolled = false }: NavbarProps) {
             ))}
 
             <div
-              style={{ borderTop: '1px solid rgba(220,201,160,0.35)', paddingTop: 16 }}
+              style={{ borderTop: '1px solid rgba(91,160,212,0.35)', paddingTop: 16 }}
               className="flex flex-col gap-2"
             >
               {SIMPLE_LINKS.map((link) => (
@@ -573,6 +527,6 @@ export default function Navbar({ scrolled = false }: NavbarProps) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

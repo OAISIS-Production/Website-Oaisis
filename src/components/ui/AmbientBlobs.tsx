@@ -1,6 +1,6 @@
 import AmbientBlob from './AmbientBlob';
 
-type BlobColor = 'green' | 'blue' | 'tan' | 'emerald';
+type BlobColor = 'white' | 'sky' | 'deep';
 
 interface BlobConfig {
   color: BlobColor;
